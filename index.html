@@ -50,7 +50,7 @@
       inset: 0;
       width: 100%;
       height: 100%;
-      border-radius: 1.1rem;
+      border-radius: 1.25rem;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       overflow: hidden;
@@ -69,12 +69,12 @@
     /* 脈衝動態光圈 */
     @keyframes pulse-sleigh {
       0%, 100% {
-        box-shadow: 0 0 15px rgba(251, 191, 36, 0.35), inset 0 0 15px rgba(251, 191, 36, 0.2);
-        border-color: rgba(251, 191, 36, 0.7);
+        box-shadow: 0 0 18px rgba(251, 191, 36, 0.4), inset 0 0 16px rgba(251, 191, 36, 0.25);
+        border-color: rgba(251, 191, 36, 0.85);
       }
       50% {
-        box-shadow: 0 0 30px rgba(251, 191, 36, 0.9), inset 0 0 25px rgba(251, 191, 36, 0.45);
-        border-color: rgba(255, 230, 0, 1);
+        box-shadow: 0 0 35px rgba(251, 191, 36, 0.95), inset 0 0 28px rgba(251, 191, 36, 0.55);
+        border-color: rgba(255, 235, 59, 1);
       }
     }
     .sleigh-highlight {
@@ -86,19 +86,19 @@
       position: fixed;
       pointer-events: none;
       z-index: 9999;
-      transform: translate(-50%, -50%) scale(1.08);
+      transform: translate(-50%, -50%) scale(1.1);
       transition: transform 0.05s ease;
-      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.8));
+      filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.85));
       display: none;
     }
   </style>
 </head>
 <body class="w-screen h-[100dvh] flex items-center justify-center bg-[#01040a]">
 
-  <!-- 拖曳浮動暫存節點 -->
-  <div id="drag-proxy" class="w-24 h-24 rounded-2xl flex flex-col items-center justify-center p-2 border-2 border-amber-300 bg-slate-900/95 backdrop-blur-md">
-    <div id="proxy-svg-box" class="w-14 h-14 flex items-center justify-center"></div>
-    <span id="proxy-title" class="text-[10px] font-bold text-white text-center mt-1 truncate max-w-full"></span>
+  <!-- 拖曳浮動暫存節點 (大字大圖) -->
+  <div id="drag-proxy" class="w-28 h-28 rounded-2xl flex flex-col items-center justify-center p-2.5 border-3 border-amber-300 bg-slate-900/95 backdrop-blur-md">
+    <div id="proxy-svg-box" class="w-16 h-16 flex items-center justify-center"></div>
+    <span id="proxy-title" class="text-xs font-black text-amber-300 text-center mt-1 truncate max-w-full"></span>
   </div>
 
   <!-- 主遊戲容器 (最大寬度 440px 手機規格) -->
@@ -107,84 +107,84 @@
     <!-- 經典動態星空與飄雪畫布 -->
     <canvas id="snow-canvas" class="absolute inset-0 pointer-events-none z-10"></canvas>
 
-    <!-- 頂部資訊 HUD 欄 -->
+    <!-- 頂部資訊 HUD 欄 (大圖示、大字體、高對比) -->
     <header class="relative z-20 pt-2.5 pb-1 px-3.5 flex items-center justify-between flex-shrink-0">
-      <!-- 左側：聖誕送禮特派員 + 黃色膠囊裝載進度 -->
+      <!-- 左側：聖誕送禮特派員 + 大號黃色膠囊裝載進度 -->
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-full bg-red-600 border border-white flex items-center justify-center text-sm shadow">
+        <div class="w-10 h-10 rounded-full bg-red-600 border-2 border-white flex items-center justify-center text-xl shadow-md">
           🎅
         </div>
         <div class="flex flex-col">
-          <span class="text-xs font-black text-white leading-none tracking-wide drop-shadow">聖誕送禮特派員</span>
-          <div class="flex items-center gap-1.5 mt-1">
-            <span class="text-[10px] font-bold text-slate-300">裝載進度</span>
-            <span id="progress-text" class="text-[11px] font-black text-slate-950 bg-amber-400 px-2 py-0.2 rounded-full font-fun shadow-sm">0 / 6</span>
+          <span class="text-sm font-black text-white leading-tight tracking-wide drop-shadow">聖誕特派員</span>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span class="text-xs font-black text-amber-200">裝載進度</span>
+            <span id="progress-text" class="text-sm font-black text-slate-950 bg-amber-400 px-2.5 py-0.5 rounded-full font-fun shadow-sm">0 / 6</span>
           </div>
         </div>
       </div>
 
-      <!-- 右側：剩餘翻牌、送禮用時、鈴鐺按鈕 -->
-      <div class="flex items-center gap-1.5">
-        <!-- 剩餘翻牌 (黑底紅心) -->
-        <div class="bg-black/85 border border-white/15 rounded-xl px-2.5 py-1 flex flex-col items-center shadow">
-          <span class="text-[8px] font-bold text-slate-400 leading-none">剩餘翻牌</span>
-          <div id="hearts-wrap" class="flex gap-0.5 text-xs text-rose-500 mt-0.5">
+      <!-- 右側：剩餘翻牌、送禮用時、鈴鐺按鈕 (放大字體) -->
+      <div class="flex items-center gap-2">
+        <!-- 剩餘翻牌 -->
+        <div class="bg-black/90 border-2 border-white/20 rounded-2xl px-2.5 py-1 flex flex-col items-center shadow">
+          <span class="text-[10px] font-black text-slate-300 leading-none">剩餘機會</span>
+          <div id="hearts-wrap" class="flex gap-1 text-sm text-rose-500 mt-1">
             <span>❤️</span><span>❤️</span><span>❤️</span>
           </div>
         </div>
 
-        <!-- 送禮用時 (黑底綠字) -->
-        <div class="bg-black/85 border border-white/15 rounded-xl px-2.5 py-1 flex flex-col items-center shadow">
-          <span class="text-[8px] font-bold text-slate-400 leading-none">送禮用時</span>
-          <span id="timer-text" class="text-xs font-black text-emerald-400 font-fun mt-0.5 tracking-wider">00:00</span>
+        <!-- 送禮用時 (大綠字) -->
+        <div class="bg-black/90 border-2 border-white/20 rounded-2xl px-3 py-1 flex flex-col items-center shadow">
+          <span class="text-[10px] font-black text-slate-300 leading-none">經過時間</span>
+          <span id="timer-text" class="text-sm font-black text-emerald-400 font-fun mt-0.5 tracking-wider">00:00</span>
         </div>
 
-        <!-- 鈴鐺按鈕 -->
-        <button id="btn-sound" class="w-7 h-7 rounded-full bg-black/85 border border-white/20 flex items-center justify-center text-xs text-amber-400 shadow active:scale-95">
+        <!-- 鈴鐺按鈕 (大點擊目標) -->
+        <button id="btn-sound" class="w-9 h-9 rounded-full bg-black/90 border-2 border-amber-400/50 flex items-center justify-center text-base text-amber-400 shadow-md active:scale-95" aria-label="切換音效">
           🔔
         </button>
       </div>
     </header>
 
-    <!-- 舞台核心區 -->
-    <main class="relative z-20 flex-1 flex flex-col justify-between px-3.5 pt-0.5 pb-2.5 overflow-hidden">
+    <!-- 舞台核心區 (緊湊垂直間距，不留大黑空洞) -->
+    <main class="relative z-20 flex-1 flex flex-col justify-between px-3.5 pt-0.5 pb-2 overflow-hidden">
       
-      <!-- 1. 頂部心願白底卡片 -->
-      <div class="relative w-full mt-1 flex-shrink-0">
-        <div class="w-full bg-white text-slate-900 rounded-2xl p-2.5 shadow-2xl border-2 border-white flex items-center justify-between">
+      <!-- 1. 頂部心願白底卡片 (大標題 20px+、大規格 14px、大字收禮人) -->
+      <div class="relative w-full mt-0.5 flex-shrink-0">
+        <div class="w-full bg-white text-slate-900 rounded-2xl p-2.5 shadow-2xl border-2 border-amber-300/80 flex items-center justify-between">
           <!-- 左側產品縮圖 -->
-          <div id="wish-svg-container" class="w-16 h-14 bg-slate-100 rounded-xl flex items-center justify-center p-1 border border-slate-200 shadow-inner flex-shrink-0">
+          <div id="wish-svg-container" class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center p-1 border-2 border-slate-200 shadow-inner flex-shrink-0">
           </div>
 
           <!-- 中央型號與功能特色 -->
           <div class="flex-1 px-3 flex flex-col justify-center min-w-0">
-            <span class="inline-block self-start text-[8.5px] font-black bg-rose-500 text-white px-2 py-0.2 rounded-md tracking-wider mb-0.5">指定聖誕願望</span>
-            <div id="wish-product-name" class="text-base font-black text-slate-950 leading-tight truncate">GS1008HP</div>
-            <div id="wish-desc" class="text-[10px] font-extrabold text-blue-600 mt-0.5 truncate">8 埠高供電 PoE 交換器</div>
+            <span class="inline-block self-start text-[10px] font-black bg-rose-600 text-white px-2.5 py-0.5 rounded-full tracking-wider mb-0.5 shadow-sm">指定聖誕願望</span>
+            <div id="wish-product-name" class="text-xl font-black text-slate-950 leading-tight truncate tracking-tight">GS1008HP</div>
+            <div id="wish-desc" class="text-sm font-black text-blue-700 mt-0.5 truncate">8 埠高供電 PoE 交換器</div>
           </div>
 
           <!-- 右側收禮人頭像與編號 -->
-          <div class="flex flex-col items-center pl-2.5 border-l border-slate-100 flex-shrink-0">
-            <div class="w-10 h-10 rounded-full bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-lg shadow-md">
+          <div class="flex flex-col items-center pl-2.5 border-l-2 border-slate-100 flex-shrink-0">
+            <div class="w-11 h-11 rounded-full bg-amber-100 border-2 border-amber-400 flex items-center justify-center text-2xl shadow">
               <span id="receiver-avatar">👷</span>
             </div>
-            <span id="receiver-name" class="text-[9.5px] font-black text-slate-800 mt-0.5">智慧園區工程師</span>
-            <span id="wish-badge" class="text-[8.5px] font-black bg-emerald-500 text-white px-2 py-0.2 rounded-full mt-0.5">第 1 位</span>
+            <span id="receiver-name" class="text-xs font-black text-slate-800 mt-1 max-w-[80px] text-center truncate">智慧園區工程師</span>
+            <span id="wish-badge" class="text-[10px] font-black bg-emerald-600 text-white px-2.5 py-0.5 rounded-full mt-0.5 shadow-sm">第 1 位</span>
           </div>
         </div>
       </div>
 
-      <!-- 2. 中間雪橇裝載大區塊 (經典大雪橇與獨立立體聖誕老人) -->
-      <div class="relative w-full my-1.5 flex flex-col items-center flex-shrink-0">
-        <!-- 頂部指引黃金小標籤 -->
-        <div class="bg-amber-400 text-slate-950 font-black text-[9.5px] py-0.5 px-3 rounded-full shadow-md border border-white/60 flex items-center gap-1 z-20 -mb-2">
-          <span>🛷</span> 拖曳正確設備至雪橇裝載
+      <!-- 2. 中間雪橇裝載大區塊 (指示文字明確放大、雪橇大且醒目) -->
+      <div class="relative w-full my-1 flex flex-col items-center flex-shrink-0">
+        <!-- 頂部指引標籤 (大字清晰) -->
+        <div class="bg-amber-400 text-slate-950 font-black text-xs py-1 px-4 rounded-full shadow-lg border border-white flex items-center gap-1.5 z-20 -mb-2.5 tracking-wide">
+          <span>🛷</span> 👉 把目標禮物拖到雪橇裡裝載！
         </div>
 
         <div class="w-full relative flex items-center">
-          <!-- 站立在雪橇旁的經典聖誕老人 -->
+          <!-- 站立在雪橇旁的聖誕老人 (大立牌) -->
           <div class="absolute -left-1 z-30 flex flex-col items-center pointer-events-none">
-            <div class="relative w-12 h-14 flex items-center justify-center drop-shadow-lg">
+            <div class="relative w-14 h-16 flex items-center justify-center drop-shadow-xl">
               <svg viewBox="0 0 60 70" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 25 C12 10 32 6 42 16 C48 22 52 26 50 30" fill="#DC2626"/>
                 <circle cx="50" cy="30" r="4.5" fill="#FFFFFF"/>
@@ -199,16 +199,16 @@
                 <rect x="23" y="51" width="6" height="6" rx="1" fill="#FBBF24"/>
               </svg>
             </div>
-            <span class="bg-rose-600 text-white font-black text-[8px] px-1.5 py-0.2 rounded-full shadow border border-white/60 -mt-1 z-10 whitespace-nowrap">
+            <span class="bg-rose-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full shadow border border-white -mt-1.5 z-10 whitespace-nowrap">
               聖誕老人
             </span>
           </div>
 
           <!-- 雪橇大放置盒 -->
-          <div id="sleigh-zone" class="w-full h-[132px] rounded-3xl bg-gradient-to-b from-[#1c0f16]/80 via-[#270e17]/60 to-[#0e0712]/90 border-2 border-dashed border-amber-400/80 p-2 pl-9 flex items-center justify-center shadow-2xl transition-all duration-300">
-            <!-- 經典紅金雪橇 SVG -->
+          <div id="sleigh-zone" class="w-full h-[126px] rounded-3xl bg-gradient-to-b from-[#1c0f16]/85 via-[#270e17]/70 to-[#0e0712]/95 border-3 border-dashed border-amber-400/90 p-2 pl-10 flex items-center justify-center shadow-2xl transition-all duration-300">
+            <!-- 經典紅金大雪橇 SVG -->
             <div class="w-full h-full flex items-center justify-center pointer-events-none opacity-95">
-              <svg viewBox="0 0 240 130" class="w-full h-full max-h-[112px]" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 240 130" class="w-full h-full max-h-[110px]" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M25 110 C48 124 195 124 220 102 C228 96 234 85 224 82 C218 80 214 88 196 95 C155 104 55 104 32 90 L25 110 Z" fill="#D97706" stroke="#FDE68A" stroke-width="2.5"/>
                 <path d="M52 100 L62 76 M170 102 L160 76" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round"/>
                 <path d="M42 76 C60 84 176 84 198 72 C210 65 206 42 190 45 C175 48 168 38 135 38 C95 38 62 41 46 54 C34 65 37 73 42 76 Z" fill="#DC2626" stroke="#FBBF24" stroke-width="3"/>
@@ -218,102 +218,102 @@
           </div>
         </div>
 
-        <!-- 下方深藍指引長條 -->
-        <div class="w-full bg-[#0a142c]/90 border border-blue-500/40 rounded-full py-1.5 px-3 mt-1.5 flex items-center justify-center text-center shadow-md">
-          <span class="text-[9.5px] font-bold text-slate-200 truncate">
-            💡 <strong class="text-amber-300">指引：</strong>每輪限翻牌 3 次！次數用盡可直接「盲猜拖曳」未掀蓋禮物盒上雪橇！
+        <!-- 下方指引長條 (大字口吻，高對比長輩易讀) -->
+        <div class="w-full bg-[#0a142c]/95 border-2 border-blue-400/50 rounded-full py-1.5 px-3.5 mt-1 flex items-center justify-center text-center shadow-md">
+          <span class="text-xs font-bold text-slate-100 truncate">
+            💡 <strong class="text-amber-300 font-black">操作提示：</strong>每輪可點翻 3 次，看準後按住拖到雪橇上！
           </span>
         </div>
       </div>
 
-      <!-- 3. 6 個大尺寸聖誕禮物盒陣列 (3 x 2 排版，尺寸大幅加大，文字圖標清晰不溢出) -->
+      <!-- 3. 6 個大尺寸禮物盒 (3 x 2 向上移緊湊排版，大編號、大按鈕、大文字) -->
       <div class="w-full flex-1 flex flex-col justify-end min-h-0 pb-1">
-        <div id="gifts-grid" class="grid grid-cols-3 gap-2.5 sm:gap-3 w-full"></div>
+        <div id="gifts-grid" class="grid grid-cols-3 gap-2.5 sm:gap-3.5 w-full"></div>
       </div>
     </main>
 
-    <!-- 5 秒記憶倒數居中提示遮罩 (置中醒目) -->
+    <!-- 5 秒記憶倒數居中提示遮罩 (超大黃金數字) -->
     <div id="countdown-modal" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none transition-all duration-300 hidden">
-      <div class="bg-slate-950/90 backdrop-blur-md border-2 border-amber-400 rounded-3xl px-8 py-5 flex flex-col items-center shadow-2xl animate-bounce">
-        <div class="text-xs font-bold text-amber-300 tracking-wider">⚡ 瞬時記憶挑戰 ⚡</div>
-        <div class="text-[11px] text-white/90 font-medium mt-1">記下 6 款設備位置！</div>
-        <div id="countdown-number" class="text-6xl font-black font-fun text-yellow-300 my-1 drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]">5</div>
-        <div class="text-[10px] text-slate-400">倒數結束後即刻蓋上</div>
+      <div class="bg-slate-950/95 backdrop-blur-md border-3 border-amber-400 rounded-3xl px-10 py-6 flex flex-col items-center shadow-2xl animate-bounce">
+        <div class="text-sm font-black text-amber-300 tracking-wider">⚡ 瞬間記憶挑戰 ⚡</div>
+        <div class="text-xs text-white font-bold mt-1">請看清並記下 6 款設備位置！</div>
+        <div id="countdown-number" class="text-7xl font-black font-fun text-yellow-300 my-1 drop-shadow-[0_0_20px_rgba(253,224,71,0.9)]">5</div>
+        <div class="text-xs text-slate-300 font-bold">倒數結束後將自動蓋上</div>
       </div>
     </div>
 
-    <!-- 遊戲開局說明彈窗 (首頁 Modal) -->
-    <div id="start-modal" class="absolute inset-0 z-50 bg-slate-950/92 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
-      <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-3xl shadow-lg border-2 border-white/40 mb-3 animate-pulse">
+    <!-- 遊戲開局說明彈窗 (大字大按鈕) -->
+    <div id="start-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+      <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-4xl shadow-xl border-2 border-white mb-3 animate-pulse">
         🎅
       </div>
       <h1 class="text-2xl font-black text-white tracking-wide">聖誕送禮特派員</h1>
-      <p class="text-xs font-bold text-amber-300 mt-1">Zyxel 聖誕禮物裝載大作戰</p>
+      <p class="text-sm font-bold text-amber-300 mt-1">Zyxel 聖誕禮物裝載大作戰</p>
 
-      <div class="w-full bg-white/10 border border-white/15 rounded-2xl p-4 my-4 text-left space-y-2.5">
-        <div class="text-xs font-bold text-white flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 font-black text-[10px] flex items-center justify-center">1</span>
+      <div class="w-full bg-white/10 border-2 border-white/20 rounded-2xl p-4 my-4 text-left space-y-3">
+        <div class="text-sm font-bold text-white flex items-center gap-2.5">
+          <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-black text-xs flex items-center justify-center flex-shrink-0">1</span>
           開局 5 秒：6 個禮物盒全掀開，考驗瞬間記憶！
         </div>
-        <div class="text-xs font-bold text-white flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 font-black text-[10px] flex items-center justify-center">2</span>
-          每輪限翻 3 次：確認指定願望後找出正確設備。
+        <div class="text-sm font-bold text-white flex items-center gap-2.5">
+          <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-black text-xs flex items-center justify-center flex-shrink-0">2</span>
+          每輪限翻 3 次：看準上方願望，找出正確設備。
         </div>
-        <div class="text-xs font-bold text-white flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 font-black text-[10px] flex items-center justify-center">3</span>
+        <div class="text-sm font-bold text-white flex items-center gap-2.5">
+          <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-black text-xs flex items-center justify-center flex-shrink-0">3</span>
           滑動上雪橇：按住翻開或未翻開的盒子拖進雪橇！
         </div>
       </div>
 
-      <button id="btn-start-game" class="w-full py-3.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white font-black text-sm tracking-wide shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-2">
+      <button id="btn-start-game" class="w-full py-4 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white font-black text-base tracking-wide shadow-2xl active:scale-95 transition-transform flex items-center justify-center gap-2 border-2 border-white/40">
         <span>🚀</span> 開始聖誕送禮挑戰
       </button>
-      <div class="text-[10px] text-slate-400 mt-3">支援電腦滑鼠與手機觸控操作</div>
+      <div class="text-xs text-slate-300 font-bold mt-3">支援電腦滑鼠與手機觸控操作</div>
     </div>
 
-    <!-- 通關成功結算彈窗 -->
-    <div id="finish-modal" class="absolute inset-0 z-50 bg-slate-950/92 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center hidden">
-      <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-200 flex items-center justify-center text-4xl shadow-[0_0_35px_rgba(251,191,36,0.6)] mb-2 animate-bounce">
+    <!-- 通關成功結算彈窗 (大字卡片) -->
+    <div id="finish-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center hidden">
+      <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-200 flex items-center justify-center text-5xl shadow-[0_0_40px_rgba(251,191,36,0.7)] mb-2 animate-bounce">
         🏆
       </div>
-      <h2 class="text-2xl font-black text-white">任務大成功！</h2>
-      <p class="text-xs text-amber-200 mt-0.5">所有聖誕願望禮物已全數裝載完畢</p>
+      <h2 class="text-3xl font-black text-white">任務大成功！</h2>
+      <p class="text-sm text-amber-200 font-bold mt-1">所有聖誕願望禮物已全數裝載完畢</p>
 
       <!-- 派送員可愛稱號卡片 -->
-      <div class="w-full bg-gradient-to-b from-slate-900/90 to-indigo-950/90 border border-amber-400/40 rounded-2xl p-4 my-4 shadow-xl">
-        <div class="text-[10px] font-bold text-amber-300 tracking-wider">獲得特派員榮譽稱號</div>
-        <div id="finish-title" class="text-lg font-black text-white mt-1">超光速極光馴鹿派送員 🦌⚡</div>
+      <div class="w-full bg-gradient-to-b from-slate-900/95 to-indigo-950/95 border-2 border-amber-400/60 rounded-2xl p-4 my-4 shadow-xl">
+        <div class="text-xs font-bold text-amber-300 tracking-wider">獲得特派員榮譽稱號</div>
+        <div id="finish-title" class="text-xl font-black text-white mt-1">超光速極光馴鹿派送員 🦌⚡</div>
         
-        <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/10">
-          <div class="bg-white/5 rounded-xl p-2">
-            <div class="text-[9px] text-slate-400">總花費時間</div>
-            <div id="finish-time" class="text-base font-black text-cyan-300 font-fun">00:35</div>
+        <div class="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-white/10">
+          <div class="bg-white/10 rounded-xl p-2.5">
+            <div class="text-xs text-slate-300 font-bold">總花費時間</div>
+            <div id="finish-time" class="text-lg font-black text-cyan-300 font-fun">00:35</div>
           </div>
-          <div class="bg-white/5 rounded-xl p-2">
-            <div class="text-[9px] text-slate-400">派送成功率</div>
-            <div class="text-base font-black text-emerald-400 font-fun">100%</div>
+          <div class="bg-white/10 rounded-xl p-2.5">
+            <div class="text-xs text-slate-300 font-bold">派送成功率</div>
+            <div class="text-lg font-black text-emerald-400 font-fun">100%</div>
           </div>
         </div>
       </div>
 
       <!-- ZYXEL 祝大家聖誕快樂專屬區塊 -->
-      <div class="w-full bg-gradient-to-r from-red-950/70 via-emerald-950/70 to-slate-900/80 border border-emerald-400/30 rounded-2xl py-3 px-4 mb-4 shadow-md flex items-center justify-center gap-2">
-        <span class="text-xl">🎄</span>
+      <div class="w-full bg-gradient-to-r from-red-950/80 via-emerald-950/80 to-slate-900/90 border-2 border-emerald-400/40 rounded-2xl py-3.5 px-4 mb-4 shadow-md flex items-center justify-center gap-3">
+        <span class="text-2xl">🎄</span>
         <div class="text-left">
-          <div class="text-xs font-black text-amber-300 tracking-wide">ZYXEL 祝大家聖誕快樂！</div>
-          <div class="text-[10px] text-slate-300 font-medium">高速・穩定・極致連網每一刻 ✨</div>
+          <div class="text-sm font-black text-amber-300 tracking-wide">ZYXEL 祝大家聖誕快樂！</div>
+          <div class="text-xs text-slate-200 font-bold mt-0.5">高速・穩定・極致連網每一刻 ✨</div>
         </div>
       </div>
 
       <!-- 再玩一次按鈕 -->
-      <button id="btn-replay" class="w-full py-3.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-sm tracking-wide shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-2">
+      <button id="btn-replay" class="w-full py-4 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-base tracking-wide shadow-2xl active:scale-95 transition-transform flex items-center justify-center gap-2 border-2 border-white/60">
         <span>🔄</span> 再挑戰一次
       </button>
     </div>
 
-    <!-- 翻牌次數用盡 Toast 浮動提醒 -->
-    <div id="toast-tip" class="absolute top-16 left-1/2 -translate-x-1/2 z-40 bg-rose-600 text-white font-bold text-xs py-1.5 px-4 rounded-full shadow-2xl pointer-events-none transition-all duration-300 opacity-0 -translate-y-2">
-      ⚠️ 翻牌機會已用盡，請憑記憶盲猜拖曳！
+    <!-- 翻牌次數用盡 Toast 浮動提醒 (字體加大) -->
+    <div id="toast-tip" class="absolute top-16 left-1/2 -translate-x-1/2 z-40 bg-rose-600 text-white font-black text-sm py-2 px-5 rounded-full shadow-2xl pointer-events-none transition-all duration-300 opacity-0 -translate-y-2 border-2 border-white/40">
+      ⚠️ 翻牌機會已用盡！請憑記憶直接拖曳盲猜！
     </div>
 
   </div>
@@ -388,7 +388,6 @@
             <rect x="6" y="34" width="88" height="38" rx="3" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/>
             <text x="50" y="45" fill="#1E293B" font-size="7.5" font-weight="900" font-family="sans-serif" text-anchor="middle">ZYXEL</text>
             <rect x="12" y="50" width="48" height="16" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="0.5"/>
-            <!-- 16埠上下兩列點陣 -->
             <rect x="15" y="52" width="4" height="5" fill="#0F172A"/>
             <rect x="21" y="52" width="4" height="5" fill="#0F172A"/>
             <rect x="27" y="52" width="4" height="5" fill="#0F172A"/>
@@ -405,7 +404,6 @@
             <rect x="45" y="59" width="4" height="5" fill="#0F172A"/>
             <rect x="51" y="59" width="4" height="5" fill="#0F172A"/>
             <rect x="55" y="59" width="4" height="5" fill="#0F172A"/>
-            <!-- SFP光纖埠 -->
             <rect x="68" y="51" width="7" height="14" fill="#334155" stroke="#64748B" stroke-width="1"/>
             <rect x="78" y="51" width="7" height="14" fill="#334155" stroke="#64748B" stroke-width="1"/>
           </svg>
@@ -473,13 +471,9 @@
         boxStyle: { bg: 'bg-[#C2410C]', ribbon: 'bg-[#FEF08A]' },
         svg: `
           <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- 底部弧形桌面立架 -->
             <path d="M28 78 L26 88 C26 92 31 94 40 94 H60 C69 94 74 92 74 88 L72 78" stroke="#CBD5E1" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-            <!-- 白色直立主機身 -->
             <rect x="28" y="10" width="44" height="70" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
-            <!-- 環繞散熱微孔線條 -->
             <rect x="33" y="15" width="34" height="60" rx="9" stroke="#94A3B8" stroke-width="1.2" stroke-dasharray="2 2" fill="none" opacity="0.6"/>
-            <!-- 品牌字樣與燈號 -->
             <text x="50" y="57" fill="#334155" font-size="6.5" font-weight="900" font-family="sans-serif" text-anchor="middle">ZYXEL</text>
             <circle cx="50" cy="65" r="1.2" fill="#22C55E"/>
           </svg>
@@ -541,8 +535,8 @@
     /* =====================================================================
        3. 遊戲狀態
     ===================================================================== */
-    const GAME_BOX_COUNT = 6;     // 盤面上大禮物盒數量改為 6 個
-    let activeProducts = [];       // 從 8 款中隨機選出的 6 款產品
+    const GAME_BOX_COUNT = 6;
+    let activeProducts = [];
     let currentLevel = 0;
     let roundOrder = [];
     let gridCards = [];
@@ -586,14 +580,12 @@
     }
 
     function initGameData() {
-      // 從 8 款完整產品中，隨機選取 6 款作為本次遊戲關卡
       activeProducts = shuffleArray(ALL_PRODUCTS).slice(0, GAME_BOX_COUNT);
       roundOrder = shuffleArray([...Array(GAME_BOX_COUNT).keys()]);
       currentLevel = 0;
       secondsElapsed = 0;
       updateTimerDisplay();
 
-      // 將這 6 款產品打亂放置在盤面的 6 個大禮物盒中
       gridCards = shuffleArray(activeProducts).map((p, idx) => ({
         ...p,
         gridIndex: idx,
@@ -603,43 +595,49 @@
     }
 
     /* =====================================================================
-       4. 渲染 6 個大尺寸禮物盒 (3 x 2 排版，尺寸更寬敞，無鏡像與溢出)
+       4. 渲染 6 個大尺寸禮物盒 (長輩高齡友善強化：大編號、大蝴蝶結、大字體、好點好拖)
     ===================================================================== */
     function renderGrid() {
       giftsGrid.innerHTML = '';
 
       gridCards.forEach((card, idx) => {
         const cardEl = document.createElement('div');
-        // 3 欄排版，每格比例方形，大幅增加點擊與顯示空間
-        cardEl.className = `aspect-square relative touch-none cursor-pointer w-full ${card.isCompleted ? 'opacity-30 pointer-events-none' : ''}`;
+        cardEl.className = `aspect-square relative touch-none cursor-pointer w-full ${card.isCompleted ? 'opacity-25 pointer-events-none' : ''}`;
         cardEl.dataset.index = idx;
 
         cardEl.innerHTML = `
           <div class="gift-card-inner ${card.isFlipped ? 'flipped' : ''}">
             
-            <!-- 正面：經典十字緞帶禮物盒 (大號黃金蝴蝶結與黑底盲拖標籤) -->
-            <div class="face-front ${card.boxStyle.bg} border-2 border-white/20 p-1.5 flex flex-col items-center justify-center shadow-lg">
-              <div class="absolute inset-x-0 h-3.5 ${card.boxStyle.ribbon} top-1/2 -translate-y-1/2 shadow-sm pointer-events-none"></div>
-              <div class="absolute inset-y-0 w-3.5 ${card.boxStyle.ribbon} left-1/2 -translate-x-1/2 shadow-sm pointer-events-none"></div>
-              <!-- 蝴蝶結標誌 -->
-              <div class="w-6 h-6 rounded-full bg-[#FBBF24] border border-white flex items-center justify-center text-xs shadow z-10 -mb-0.5 pointer-events-none">
+            <!-- 正面：經典十字緞帶 (帶有醒目大編號標籤「1號盒」方便長輩記憶) -->
+            <div class="face-front ${card.boxStyle.bg} border-2 border-white/30 p-1 flex flex-col items-center justify-between shadow-xl">
+              <!-- 上方大編號標籤 -->
+              <div class="bg-black/85 text-yellow-300 font-black text-xs px-2.5 py-0.5 rounded-full z-10 border border-yellow-300/60 shadow">
+                ${idx + 1} 號盒
+              </div>
+
+              <!-- 十字緞帶與大蝴蝶結 -->
+              <div class="absolute inset-x-0 h-4 ${card.boxStyle.ribbon} top-1/2 -translate-y-1/2 shadow pointer-events-none"></div>
+              <div class="absolute inset-y-0 w-4 ${card.boxStyle.ribbon} left-1/2 -translate-x-1/2 shadow pointer-events-none"></div>
+              
+              <div class="w-8 h-8 rounded-full bg-[#FBBF24] border-2 border-white flex items-center justify-center text-sm shadow-md z-10 pointer-events-none">
                 🎀
               </div>
-              <!-- 點擊/盲拖膠囊 -->
-              <div class="bg-black/75 rounded-md px-2 py-0.5 z-10 border border-white/35 mt-1 pointer-events-none shadow-sm">
-                <span class="text-[9.5px] sm:text-[10.5px] font-black text-white whitespace-nowrap block leading-tight">點擊/盲拖</span>
+
+              <!-- 底部大按鈕：點開 / 拖曳 -->
+              <div class="bg-white text-slate-950 font-black rounded-lg px-2.5 py-1 z-10 border-2 border-slate-900 shadow-md">
+                <span class="text-xs font-black whitespace-nowrap block leading-tight">點開 / 拖曳</span>
               </div>
             </div>
 
-            <!-- 背面：翻開展示設備 (充足空間，完美包覆於卡片內絕不溢出) -->
-            <div class="face-back bg-slate-900 border-2 border-cyan-400 p-1.5 flex flex-col items-center justify-between shadow-inner">
+            <!-- 背面：翻開展示設備 (字體加大、絕不跑出框外) -->
+            <div class="face-back bg-slate-900 border-3 border-cyan-400 p-1.5 flex flex-col items-center justify-between shadow-inner">
               <div class="w-full flex-1 flex items-center justify-center min-h-0 p-1">
                 ${card.svg}
               </div>
-              <!-- 底部型號與拖曳提示標籤：自帶內襯防溢出 -->
-              <div class="w-full bg-slate-950/90 rounded-md py-1 px-1 text-center flex-shrink-0 border border-white/10 mt-1">
-                <div class="text-[9.5px] sm:text-[10.5px] font-black text-amber-300 truncate w-full leading-tight">${card.name}</div>
-                <div class="text-[8px] text-cyan-400 font-bold leading-none mt-0.5">👆 按住拖曳</div>
+              <!-- 底部產品型號放大至 13px+，指示大而清晰 -->
+              <div class="w-full bg-slate-950 rounded-lg py-1 px-1 text-center flex-shrink-0 border border-white/20">
+                <div class="text-xs sm:text-sm font-black text-amber-300 truncate w-full leading-tight tracking-tight">${card.name}</div>
+                <div class="text-[10px] text-cyan-300 font-black leading-none mt-0.5">👆 拖到雪橇</div>
               </div>
             </div>
 
@@ -703,11 +701,11 @@
           if (draggedItem.isFlipped) {
             proxySvgBox.innerHTML = draggedItem.svg;
             proxyTitle.textContent = draggedItem.name;
-            dragProxy.className = "w-24 h-24 rounded-2xl flex flex-col items-center justify-center p-2 border-2 border-cyan-400 bg-slate-900/90 backdrop-blur-md shadow-2xl";
+            dragProxy.className = "w-28 h-28 rounded-2xl flex flex-col items-center justify-center p-2.5 border-3 border-cyan-400 bg-slate-900/95 backdrop-blur-md shadow-2xl";
           } else {
-            proxySvgBox.innerHTML = '<span class="text-3xl animate-bounce">🎁</span>';
-            proxyTitle.textContent = "盲猜此禮盒";
-            dragProxy.className = "w-24 h-24 rounded-2xl flex flex-col items-center justify-center p-2 border-2 border-amber-400 bg-red-950/90 backdrop-blur-md shadow-2xl";
+            proxySvgBox.innerHTML = '<span class="text-4xl animate-bounce">🎁</span>';
+            proxyTitle.textContent = `${draggedItem.gridIndex + 1} 號禮盒`;
+            dragProxy.className = "w-28 h-28 rounded-2xl flex flex-col items-center justify-center p-2.5 border-3 border-amber-400 bg-red-950/95 backdrop-blur-md shadow-2xl";
           }
           sleighZone.classList.add('sleigh-highlight');
         }
@@ -757,10 +755,10 @@
         renderGrid();
 
         if (flipsLeft === 0) {
-          showToast('⚠️ 翻牌次數已用盡！請憑記憶直接盲猜拖曳！');
+          showToast('⚠️ 翻牌機會已用完！請直接按住禮盒拖到雪橇盲猜！');
         }
       } else {
-        showToast('⚠️ 翻牌次數已用盡！請憑記憶直接盲猜拖曳禮盒！');
+        showToast('⚠️ 翻牌次數已用盡！請直接按住禮盒拖到雪橇盲猜！');
         soundWrong();
       }
     }
@@ -802,11 +800,11 @@
       toastTimeout = setTimeout(() => {
         toastTip.classList.remove('opacity-100', 'translate-y-0');
         toastTip.classList.add('opacity-0', '-translate-y-2');
-      }, 2200);
+      }, 2400);
     }
 
     /* =====================================================================
-       6. 5 秒記憶倒數
+       6. 5 秒記憶倒數 (大數字大動畫)
     ===================================================================== */
     function startMemoryCountDown(callback) {
       isMemoryPhase = true;
