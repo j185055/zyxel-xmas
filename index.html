@@ -4,1130 +4,988 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>聖誕送禮特派員 - Zyxel 聖誕大作戰</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Noto+Sans+TC:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800;900&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+
   <style>
     * {
+      box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
-      box-sizing: border-box;
     }
-    body {
-      font-family: 'Noto Sans TC', sans-serif;
-      touch-action: none;
-      overflow: hidden;
-      width: 100vw;
+    html, body {
+      height: 100%;
       height: 100dvh;
-      background-color: #030712;
       margin: 0;
       padding: 0;
-    }
-
-    /* 手機直式外框限制 (430px 標準尺寸，還原截圖外觀) */
-    .mobile-container {
-      width: 100%;
-      height: 100dvh;
-      max-width: 440px;
-      margin: 0 auto;
-      position: relative;
-      display: flex;
-      flex-direction: column;
+      background-color: #020611;
+      font-family: 'Noto Sans TC', sans-serif;
       overflow: hidden;
-      background-color: #04091a;
-      background-image: url('極光雪夜送禮特派員.jpg'), radial-gradient(circle at 50% 30%, #0d1e3d 0%, #040816 85%);
-      background-size: cover, auto;
-      background-position: center top, center;
-      background-repeat: no-repeat;
-      box-shadow: 0 0 50px rgba(0,0,0,0.9);
+      touch-action: none;
+    }
+    .font-fun {
+      font-family: 'Fredoka', 'Noto Sans TC', cursive, sans-serif;
     }
 
-    /* 雪橇放置區黃金呼吸提示 */
-    @keyframes sleighPulse {
-      0%, 100% { border-color: rgba(251, 191, 36, 0.75); box-shadow: 0 0 16px rgba(251, 191, 36, 0.35); }
-      50% { border-color: #fde047; box-shadow: 0 0 28px rgba(253, 224, 71, 0.8), inset 0 0 20px rgba(251, 191, 36, 0.3); }
-    }
-    .sleigh-target-glow {
-      animation: sleighPulse 1.8s infinite ease-in-out;
-    }
-
-    /* 禮物盒 3D 翻牌效果 */
-    .perspective-box {
-      perspective: 800px;
-    }
-    .flip-card-inner {
-      transition: transform 0.5s cubic-bezier(0.34, 1.45, 0.64, 1);
-      transform-style: preserve-3d;
+    /* 3D 翻轉卡片結構：徹底解決手機鏡像與字體重疊 */
+    .gift-card-inner {
       position: relative;
       width: 100%;
       height: 100%;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
     }
-    .flip-card-inner.flipped {
+    .gift-card-inner.flipped {
       transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
     }
-    .flip-card-front, .flip-card-back {
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
+    
+    .face-front, .face-back {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
+      border-radius: 1.1rem;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
     }
-    .flip-card-back {
+    .face-back {
       transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
+    }
+    
+    /* 翻開後立即隱藏正面，根除手機 WebKit 渲染穿透與鏡像文字 */
+    .gift-card-inner.flipped .face-front {
+      opacity: 0 !important;
+      visibility: hidden !important;
     }
 
-    /* 拖曳中的手感跟隨元件 */
-    .floating-drag-item {
+    /* 脈衝動態光圈 */
+    @keyframes pulse-sleigh {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(251, 191, 36, 0.35), inset 0 0 15px rgba(251, 191, 36, 0.2);
+        border-color: rgba(251, 191, 36, 0.7);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.9), inset 0 0 25px rgba(251, 191, 36, 0.45);
+        border-color: rgba(255, 230, 0, 1);
+      }
+    }
+    .sleigh-highlight {
+      animation: pulse-sleigh 1.2s infinite ease-in-out;
+    }
+
+    /* 拖曳中的影子鏡像 */
+    #drag-proxy {
       position: fixed;
       pointer-events: none;
       z-index: 9999;
-      transform: translate(-50%, -50%) scale(1.15) rotate(2deg);
-      filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.75));
-    }
-
-    /* 通關雪橇夜空飛天動畫 */
-    @keyframes sleighTakeOff {
-      0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
-      20% { transform: translate(-15px, 10px) scale(1.05) rotate(-5deg); }
-      100% { transform: translate(120vw, -75vh) scale(0.55) rotate(18deg); opacity: 0; }
-    }
-    .sleigh-flying {
-      animation: sleighTakeOff 3.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      transform: translate(-50%, -50%) scale(1.08);
+      transition: transform 0.05s ease;
+      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.8));
+      display: none;
     }
   </style>
 </head>
-<body class="flex justify-center items-center">
+<body class="w-screen h-[100dvh] flex items-center justify-center bg-[#01040a]">
 
-  <div class="mobile-container text-white">
-    <!-- 背景暗色漸層遮罩，使前景更為立體高對比 -->
-    <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/85 pointer-events-none z-0"></div>
+  <!-- 拖曳浮動暫存節點 -->
+  <div id="drag-proxy" class="w-24 h-24 rounded-2xl flex flex-col items-center justify-center p-2 border-2 border-amber-300 bg-slate-900/95 backdrop-blur-md">
+    <div id="proxy-svg-box" class="w-14 h-14 flex items-center justify-center"></div>
+    <span id="proxy-title" class="text-[10px] font-bold text-white text-center mt-1 truncate max-w-full"></span>
+  </div>
 
-    <!-- 全螢幕降雪 Canvas -->
-    <canvas id="snowCanvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+  <!-- 主遊戲容器 (最大寬度 440px 手機規格) -->
+  <div id="game-container" class="relative w-full max-w-[440px] h-[100dvh] overflow-hidden flex flex-col shadow-2xl select-none bg-gradient-to-b from-[#020713] via-[#040c1e] to-[#02050e]">
+    
+    <!-- 經典動態星空與飄雪畫布 -->
+    <canvas id="snow-canvas" class="absolute inset-0 pointer-events-none z-10"></canvas>
 
-    <!-- 1. 頂部狀態列 (完美對齊截圖) -->
-    <header class="relative z-20 px-3.5 pt-3 pb-2 flex items-center justify-between">
-      <!-- 左側：聖誕老人與進度 -->
+    <!-- 頂部資訊 HUD 欄 -->
+    <header class="relative z-20 pt-2.5 pb-1 px-3.5 flex items-center justify-between flex-shrink-0">
+      <!-- 左側：聖誕送禮特派員 + 黃色膠囊裝載進度 -->
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-full bg-red-600/90 border border-white/40 flex items-center justify-center text-lg shadow-md">
+        <div class="w-8 h-8 rounded-full bg-red-600 border border-white flex items-center justify-center text-sm shadow">
           🎅
         </div>
-        <div>
-          <h1 class="text-xs font-black tracking-wide text-white drop-shadow">聖誕送禮特派員</h1>
-          <div class="flex items-center gap-1.5 mt-0.5">
-            <span class="text-[10px] text-slate-300">裝載進度</span>
-            <span id="progressText" class="text-[10px] bg-amber-400 text-red-950 font-black px-2 py-0.2 rounded-full shadow-sm">0 / 7</span>
+        <div class="flex flex-col">
+          <span class="text-xs font-black text-white leading-none tracking-wide drop-shadow">聖誕送禮特派員</span>
+          <div class="flex items-center gap-1.5 mt-1">
+            <span class="text-[10px] font-bold text-slate-300">裝載進度</span>
+            <span id="progress-text" class="text-[11px] font-black text-slate-950 bg-amber-400 px-2 py-0.2 rounded-full font-fun shadow-sm">0 / 6</span>
           </div>
         </div>
       </div>
 
-      <!-- 右側：剩餘翻牌、送禮用時、音效鍵 -->
-      <div class="flex items-center gap-2">
-        <!-- 剩餘翻牌次數 (深色圓角卡) -->
-        <div class="bg-black/80 border border-white/10 px-2.5 py-1 rounded-xl text-center shadow">
-          <span class="text-[8px] text-slate-300 block leading-none mb-0.5">剩餘翻牌</span>
-          <span id="chancesText" class="text-xs font-black tracking-widest text-rose-500 leading-none">❤️❤️❤️</span>
+      <!-- 右側：剩餘翻牌、送禮用時、鈴鐺按鈕 -->
+      <div class="flex items-center gap-1.5">
+        <!-- 剩餘翻牌 (黑底紅心) -->
+        <div class="bg-black/85 border border-white/15 rounded-xl px-2.5 py-1 flex flex-col items-center shadow">
+          <span class="text-[8px] font-bold text-slate-400 leading-none">剩餘翻牌</span>
+          <div id="hearts-wrap" class="flex gap-0.5 text-xs text-rose-500 mt-0.5">
+            <span>❤️</span><span>❤️</span><span>❤️</span>
+          </div>
         </div>
-        <!-- 送禮計時 (霓虹綠色) -->
-        <div class="bg-black/80 border border-white/10 px-2.5 py-1 rounded-xl text-center shadow">
-          <span class="text-[8px] text-slate-300 block leading-none mb-0.5">送禮用時</span>
-          <span id="timerText" class="text-xs font-mono font-black text-emerald-400 leading-none">00:00</span>
+
+        <!-- 送禮用時 (黑底綠字) -->
+        <div class="bg-black/85 border border-white/15 rounded-xl px-2.5 py-1 flex flex-col items-center shadow">
+          <span class="text-[8px] font-bold text-slate-400 leading-none">送禮用時</span>
+          <span id="timer-text" class="text-xs font-black text-emerald-400 font-fun mt-0.5 tracking-wider">00:00</span>
         </div>
-        <!-- 鈴鐺音效開關 -->
-        <button id="soundBtn" class="w-8 h-8 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-sm active:scale-90 transition shadow">
+
+        <!-- 鈴鐺按鈕 -->
+        <button id="btn-sound" class="w-7 h-7 rounded-full bg-black/85 border border-white/20 flex items-center justify-center text-xs text-amber-400 shadow active:scale-95">
           🔔
         </button>
       </div>
     </header>
 
-    <!-- 2. 懸浮通知與心願白雲卡片區 (對齊截圖) -->
-    <div class="relative z-10 px-3.5 pt-1">
-      <!-- 提示膠囊 -->
-      <div id="noticeBanner" class="w-full bg-blue-600/90 backdrop-blur border border-blue-300/40 rounded-full py-1 px-3 text-center text-[10px] font-black text-white shadow-lg mb-2 flex items-center justify-center gap-1.5 transition-all duration-300">
-        <span>💡</span>
-        <span id="noticeBannerText">⏰ 時間到！禮物已蓋上，遊戲正式開始！</span>
+    <!-- 舞台核心區 -->
+    <main class="relative z-20 flex-1 flex flex-col justify-between px-3.5 pt-0.5 pb-2.5 overflow-hidden">
+      
+      <!-- 1. 頂部心願白底卡片 -->
+      <div class="relative w-full mt-1 flex-shrink-0">
+        <div class="w-full bg-white text-slate-900 rounded-2xl p-2.5 shadow-2xl border-2 border-white flex items-center justify-between">
+          <!-- 左側產品縮圖 -->
+          <div id="wish-svg-container" class="w-16 h-14 bg-slate-100 rounded-xl flex items-center justify-center p-1 border border-slate-200 shadow-inner flex-shrink-0">
+          </div>
+
+          <!-- 中央型號與功能特色 -->
+          <div class="flex-1 px-3 flex flex-col justify-center min-w-0">
+            <span class="inline-block self-start text-[8.5px] font-black bg-rose-500 text-white px-2 py-0.2 rounded-md tracking-wider mb-0.5">指定聖誕願望</span>
+            <div id="wish-product-name" class="text-base font-black text-slate-950 leading-tight truncate">GS1008HP</div>
+            <div id="wish-desc" class="text-[10px] font-extrabold text-blue-600 mt-0.5 truncate">8 埠高供電 PoE 交換器</div>
+          </div>
+
+          <!-- 右側收禮人頭像與編號 -->
+          <div class="flex flex-col items-center pl-2.5 border-l border-slate-100 flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-lg shadow-md">
+              <span id="receiver-avatar">👷</span>
+            </div>
+            <span id="receiver-name" class="text-[9.5px] font-black text-slate-800 mt-0.5">智慧園區工程師</span>
+            <span id="wish-badge" class="text-[8.5px] font-black bg-emerald-500 text-white px-2 py-0.2 rounded-full mt-0.5">第 1 位</span>
+          </div>
+        </div>
       </div>
 
-      <!-- 白底大卡片：願望產品 + 收禮人 -->
-      <div class="bg-white text-slate-900 rounded-3xl p-3 shadow-2xl border-2 border-white flex items-center justify-between gap-3">
-        <!-- 左側：產品 SVG 圖形 -->
-        <div id="targetProductGraphic" class="w-16 h-16 bg-slate-50 rounded-2xl border border-slate-200 p-1 flex items-center justify-center flex-shrink-0 shadow-inner">
-          <!-- 設備 SVG 注入點 -->
+      <!-- 2. 中間雪橇裝載大區塊 (經典大雪橇與獨立立體聖誕老人) -->
+      <div class="relative w-full my-1.5 flex flex-col items-center flex-shrink-0">
+        <!-- 頂部指引黃金小標籤 -->
+        <div class="bg-amber-400 text-slate-950 font-black text-[9.5px] py-0.5 px-3 rounded-full shadow-md border border-white/60 flex items-center gap-1 z-20 -mb-2">
+          <span>🛷</span> 拖曳正確設備至雪橇裝載
         </div>
 
-        <!-- 中間：產品名稱與藍色標籤 -->
-        <div class="flex-1 overflow-hidden">
-          <span class="inline-block text-[9px] font-black bg-rose-600 text-white px-2 py-0.5 rounded-full mb-0.5">指定聖誕願望</span>
-          <div id="targetProductName" class="text-sm font-black text-slate-900 truncate tracking-tight">GS1008HP</div>
-          <div id="targetProductTag" class="text-[10px] font-bold text-blue-600 truncate">8 埠高供電 PoE 交換器</div>
-        </div>
-
-        <!-- 右側：收禮人頭像與身分標籤 -->
-        <div class="flex flex-col items-center flex-shrink-0 w-20 text-center">
-          <div id="recipientAvatar" class="w-11 h-11 rounded-full bg-amber-400 border-2 border-white flex items-center justify-center text-xl shadow-md">
-            👷
+        <div class="w-full relative flex items-center">
+          <!-- 站立在雪橇旁的經典聖誕老人 -->
+          <div class="absolute -left-1 z-30 flex flex-col items-center pointer-events-none">
+            <div class="relative w-12 h-14 flex items-center justify-center drop-shadow-lg">
+              <svg viewBox="0 0 60 70" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 25 C12 10 32 6 42 16 C48 22 52 26 50 30" fill="#DC2626"/>
+                <circle cx="50" cy="30" r="4.5" fill="#FFFFFF"/>
+                <rect x="10" y="24" width="34" height="6" rx="3" fill="#FFFFFF"/>
+                <circle cx="26" cy="31" r="11" fill="#FDE047" opacity="0.3"/>
+                <circle cx="21" cy="30" r="1.5" fill="#1E293B"/>
+                <circle cx="31" cy="30" r="1.5" fill="#1E293B"/>
+                <circle cx="26" cy="33" r="2" fill="#F43F5E"/>
+                <path d="M14 31 C14 46 38 46 38 31 C38 40 33 46 26 48 C19 46 14 40 14 31 Z" fill="#FFFFFF"/>
+                <path d="M14 42 C10 50 8 64 8 68 H44 C44 64 42 50 38 42 Z" fill="#DC2626"/>
+                <rect x="11" y="52" width="30" height="4" fill="#0F172A"/>
+                <rect x="23" y="51" width="6" height="6" rx="1" fill="#FBBF24"/>
+              </svg>
+            </div>
+            <span class="bg-rose-600 text-white font-black text-[8px] px-1.5 py-0.2 rounded-full shadow border border-white/60 -mt-1 z-10 whitespace-nowrap">
+              聖誕老人
+            </span>
           </div>
-          <div id="recipientRole" class="text-[10px] font-black text-slate-800 truncate mt-1 w-full">智慧園區工程師</div>
-          <div id="roundBadge" class="text-[9px] bg-emerald-600 text-white font-black px-2 py-0.2 rounded-full mt-0.5 shadow-sm">第 1 位</div>
+
+          <!-- 雪橇大放置盒 -->
+          <div id="sleigh-zone" class="w-full h-[132px] rounded-3xl bg-gradient-to-b from-[#1c0f16]/80 via-[#270e17]/60 to-[#0e0712]/90 border-2 border-dashed border-amber-400/80 p-2 pl-9 flex items-center justify-center shadow-2xl transition-all duration-300">
+            <!-- 經典紅金雪橇 SVG -->
+            <div class="w-full h-full flex items-center justify-center pointer-events-none opacity-95">
+              <svg viewBox="0 0 240 130" class="w-full h-full max-h-[112px]" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M25 110 C48 124 195 124 220 102 C228 96 234 85 224 82 C218 80 214 88 196 95 C155 104 55 104 32 90 L25 110 Z" fill="#D97706" stroke="#FDE68A" stroke-width="2.5"/>
+                <path d="M52 100 L62 76 M170 102 L160 76" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M42 76 C60 84 176 84 198 72 C210 65 206 42 190 45 C175 48 168 38 135 38 C95 38 62 41 46 54 C34 65 37 73 42 76 Z" fill="#DC2626" stroke="#FBBF24" stroke-width="3"/>
+                <path d="M52 64 C86 52 155 52 188 64" stroke="#FDE68A" stroke-width="3" stroke-dasharray="4 3" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
         </div>
+
+        <!-- 下方深藍指引長條 -->
+        <div class="w-full bg-[#0a142c]/90 border border-blue-500/40 rounded-full py-1.5 px-3 mt-1.5 flex items-center justify-center text-center shadow-md">
+          <span class="text-[9.5px] font-bold text-slate-200 truncate">
+            💡 <strong class="text-amber-300">指引：</strong>每輪限翻牌 3 次！次數用盡可直接「盲猜拖曳」未掀蓋禮物盒上雪橇！
+          </span>
+        </div>
+      </div>
+
+      <!-- 3. 6 個大尺寸聖誕禮物盒陣列 (3 x 2 排版，尺寸大幅加大，文字圖標清晰不溢出) -->
+      <div class="w-full flex-1 flex flex-col justify-end min-h-0 pb-1">
+        <div id="gifts-grid" class="grid grid-cols-3 gap-2.5 sm:gap-3 w-full"></div>
+      </div>
+    </main>
+
+    <!-- 5 秒記憶倒數居中提示遮罩 (置中醒目) -->
+    <div id="countdown-modal" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none transition-all duration-300 hidden">
+      <div class="bg-slate-950/90 backdrop-blur-md border-2 border-amber-400 rounded-3xl px-8 py-5 flex flex-col items-center shadow-2xl animate-bounce">
+        <div class="text-xs font-bold text-amber-300 tracking-wider">⚡ 瞬時記憶挑戰 ⚡</div>
+        <div class="text-[11px] text-white/90 font-medium mt-1">記下 6 款設備位置！</div>
+        <div id="countdown-number" class="text-6xl font-black font-fun text-yellow-300 my-1 drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]">5</div>
+        <div class="text-[10px] text-slate-400">倒數結束後即刻蓋上</div>
       </div>
     </div>
 
-    <!-- 3. 中間核心大雪橇裝載區 (放大版面，完整還原截圖) -->
-    <div class="relative z-10 px-3.5 pt-3">
-      <div class="relative w-full flex items-center">
-        <!-- 左下側：聖誕老人大頭立牌 -->
-        <div class="absolute left-1 bottom-1 z-20 flex flex-col items-center">
-          <div class="w-11 h-11 rounded-full bg-red-600 border-2 border-white flex items-center justify-center text-2xl shadow-lg">
-            🎅
-          </div>
-          <span class="text-[8px] bg-red-700 text-white font-black px-1.5 py-0.2 rounded-full -mt-1 border border-red-300 shadow">聖誕老人</span>
-        </div>
-
-        <!-- 正中央大雪橇裝載區 (金色虛線框 + 大紅金雪橇) -->
-        <div id="sleighDropZone" class="w-full h-36 bg-gradient-to-b from-amber-950/40 to-red-950/50 rounded-3xl border-2 border-dashed border-amber-400/90 flex flex-col items-center justify-center relative p-2 sleigh-target-glow transition-all duration-300">
-          
-          <!-- 頂部指引標籤 -->
-          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-yellow-300 text-red-950 font-black text-[9px] px-3 py-0.5 rounded-full shadow-lg border border-white flex items-center gap-1 whitespace-nowrap z-10">
-            <span>🛷</span>
-            <span>拖曳正確設備至雪橇裝載</span>
-          </div>
-
-          <!-- 已裝入設備迷你圖示容器 -->
-          <div id="sleighCargoList" class="absolute inset-0 flex items-center justify-center flex-wrap gap-1 p-3 pointer-events-none z-10"></div>
-
-          <!-- 大雪橇向量圖 (經典紅身金底雙滑軌) -->
-          <div class="w-full h-full flex items-center justify-center pl-10 pr-4">
-            <svg viewBox="0 0 280 110" class="w-full max-h-[95px] drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]">
-              <!-- 雪橇金色滑軌底座 -->
-              <path d="M 25 95 Q 60 102 210 102 Q 260 102 272 82 Q 278 68 260 68 Q 252 68 256 78 Q 238 90 190 90 L 45 90 Q 22 90 15 75 L 8 76 Q 12 95 25 95 Z" fill="#f59e0b" stroke="#78350f" stroke-width="1.8"/>
-              <rect x="65" y="70" width="8" height="25" rx="3" fill="#d97706"/>
-              <rect x="145" y="70" width="8" height="25" rx="3" fill="#d97706"/>
-              <rect x="215" y="70" width="8" height="25" rx="3" fill="#d97706"/>
-              <!-- 紅金主車廂 -->
-              <path d="M 40 38 Q 28 72 65 76 L 235 76 Q 255 76 250 50 Q 242 32 210 38 Q 145 46 115 26 Q 85 8 52 28 Z" fill="#b91c1c" stroke="#fcd34d" stroke-width="3"/>
-              <!-- 金邊流線虛線綴飾 -->
-              <path d="M 55 50 Q 105 64 155 52 Q 195 44 235 56" fill="none" stroke="#fde047" stroke-width="2.5" stroke-dasharray="4,4"/>
-            </svg>
-          </div>
-        </div>
+    <!-- 遊戲開局說明彈窗 (首頁 Modal) -->
+    <div id="start-modal" class="absolute inset-0 z-50 bg-slate-950/92 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+      <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-3xl shadow-lg border-2 border-white/40 mb-3 animate-pulse">
+        🎅
       </div>
-    </div>
+      <h1 class="text-2xl font-black text-white tracking-wide">聖誕送禮特派員</h1>
+      <p class="text-xs font-bold text-amber-300 mt-1">Zyxel 聖誕禮物裝載大作戰</p>
 
-    <!-- 4. 指引小長條 (還原截圖) -->
-    <div class="relative z-10 px-3.5 pt-2 pb-1">
-      <div class="bg-blue-950/70 border border-blue-400/30 rounded-2xl px-3 py-1.5 text-[9px] text-blue-200 flex items-center justify-center gap-1.5 shadow-inner">
-        <span class="text-amber-300 font-black">💡 指引：</span>
-        <span id="hintBanner">每輪限翻牌 3 次！次數用盡可直接「盲猜拖曳」未掀蓋禮物盒上雪橇！</span>
-      </div>
-    </div>
-
-    <!-- 5. 7 個多彩禮物盒 (精準還原截圖：上排 4 個，下排 3 個置中) -->
-    <section class="relative z-10 flex-1 px-3.5 pb-4 flex flex-col justify-end">
-      <!-- 上排 4 個 -->
-      <div id="topRowGifts" class="grid grid-cols-4 gap-2 mb-2"></div>
-      <!-- 下排 3 個置中 -->
-      <div class="flex justify-center">
-        <div id="bottomRowGifts" class="grid grid-cols-3 gap-2 w-3/4"></div>
-      </div>
-    </section>
-
-  </div>
-
-  <!-- 遊戲開始說明彈窗 (首頁 Modal) -->
-  <div id="startModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300">
-    <div class="bg-gradient-to-b from-[#14234d] via-[#101b3d] to-[#090e21] border-2 border-amber-400 rounded-3xl max-w-[350px] w-full p-5 text-center shadow-[0_0_50px_rgba(251,191,36,0.35)] relative flex flex-col max-h-[92dvh] overflow-y-auto">
-      <div class="text-4xl mb-1.5 animate-bounce">🎅🛷🎁</div>
-      <h2 class="text-xl font-black text-amber-300 drop-shadow mb-1">聖誕送禮特派員</h2>
-      <p class="text-[11px] text-blue-200 mb-3 leading-snug">
-        聖誕夜來臨！聖誕老人需要你的超強記憶力與手速，把 7 款 Zyxel 網路設備送到大家手上！
-      </p>
-
-      <div class="bg-white/10 rounded-2xl p-3 border border-white/15 mb-4 text-left flex flex-col gap-2">
-        <div class="flex items-start gap-2">
-          <div class="w-5 h-5 rounded-full bg-amber-400 text-red-950 font-black flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</div>
-          <div class="text-[10px] text-slate-200 leading-tight">
-            <span class="font-bold text-amber-300">開局 5 秒極速記憶</span>：全禮盒自動掀開 5 秒，快記住位置！
-          </div>
+      <div class="w-full bg-white/10 border border-white/15 rounded-2xl p-4 my-4 text-left space-y-2.5">
+        <div class="text-xs font-bold text-white flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 font-black text-[10px] flex items-center justify-center">1</span>
+          開局 5 秒：6 個禮物盒全掀開，考驗瞬間記憶！
         </div>
-        <div class="flex items-start gap-2">
-          <div class="w-5 h-5 rounded-full bg-rose-500 text-white font-black flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</div>
-          <div class="text-[10px] text-slate-200 leading-tight">
-            <span class="font-bold text-rose-300">每輪限翻 3 次</span>：查看願望白雲卡，找出指定設備。
-          </div>
+        <div class="text-xs font-bold text-white flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 font-black text-[10px] flex items-center justify-center">2</span>
+          每輪限翻 3 次：確認指定願望後找出正確設備。
         </div>
-        <div class="flex items-start gap-2">
-          <div class="w-5 h-5 rounded-full bg-emerald-400 text-slate-950 font-black flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</div>
-          <div class="text-[10px] text-slate-200 leading-tight">
-            <span class="font-bold text-emerald-300">滑入雪橇 & 盲猜</span>：按住拖曳進雪橇！次數用盡可直接盲拖！
-          </div>
+        <div class="text-xs font-bold text-white flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 font-black text-[10px] flex items-center justify-center">3</span>
+          滑動上雪橇：按住翻開或未翻開的盒子拖進雪橇！
         </div>
       </div>
 
-      <button id="startGameBtn" class="w-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 active:scale-95 text-red-950 font-black py-3 rounded-2xl shadow-xl text-sm transition border-2 border-white flex items-center justify-center gap-2">
-        <span>🚀 開始聖誕送禮挑戰！</span>
+      <button id="btn-start-game" class="w-full py-3.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white font-black text-sm tracking-wide shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-2">
+        <span>🚀</span> 開始聖誕送禮挑戰
       </button>
-      <div class="text-[9px] text-slate-400 mt-2">支援手機觸控滑動・全破可獲得可愛特派員封號</div>
+      <div class="text-[10px] text-slate-400 mt-3">支援電腦滑鼠與手機觸控操作</div>
     </div>
-  </div>
 
-  <!-- 5 秒記憶倒數居中提示框 (高清不模糊禮盒) -->
-  <div id="memorizeOverlay" class="fixed inset-0 z-40 flex items-center justify-center pointer-events-none opacity-0 transition-all duration-300">
-    <div class="bg-slate-950/90 border-4 border-amber-400 rounded-3xl p-5 text-center shadow-[0_0_60px_rgba(251,191,36,0.6)] flex flex-col items-center max-w-[280px] w-full transform scale-90 transition-transform duration-300">
-      <div class="flex items-center gap-2 mb-1">
-        <span class="text-3xl animate-bounce">🧠</span>
-        <span class="text-xs font-black text-amber-300 tracking-wider">5 秒極速記憶</span>
+    <!-- 通關成功結算彈窗 -->
+    <div id="finish-modal" class="absolute inset-0 z-50 bg-slate-950/92 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center hidden">
+      <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-200 flex items-center justify-center text-4xl shadow-[0_0_35px_rgba(251,191,36,0.6)] mb-2 animate-bounce">
+        🏆
       </div>
-      <div class="text-[11px] text-slate-200 mb-1 font-medium">快記住下方 7 款設備位置！</div>
-      <div id="countdownNum" class="text-6xl font-black text-amber-400 font-mono tracking-tighter drop-shadow-[0_0_20px_rgba(251,191,36,0.95)] my-1 animate-pulse">5</div>
-      <div class="text-[10px] text-rose-300 font-bold bg-rose-950/70 border border-rose-500/40 px-3 py-1 rounded-full mt-1">
-        倒數完畢後全部蓋上！
-      </div>
-    </div>
-  </div>
+      <h2 class="text-2xl font-black text-white">任務大成功！</h2>
+      <p class="text-xs text-amber-200 mt-0.5">所有聖誕願望禮物已全數裝載完畢</p>
 
-  <!-- Toast 訊息提示條 -->
-  <div id="toast" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 -translate-y-3 px-4 py-2 rounded-2xl text-xs font-black shadow-2xl flex items-center gap-1.5 border whitespace-nowrap">
-    <span id="toastIcon">✨</span>
-    <span id="toastMsg">成功裝載！</span>
-  </div>
-
-  <!-- 全破通關 Modal (可愛稱呼計分) -->
-  <div id="victoryModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-500">
-    <div class="bg-gradient-to-b from-[#14234d] to-[#090e21] border-2 border-amber-400 rounded-3xl max-w-[340px] w-full p-5 text-center shadow-[0_0_50px_rgba(251,191,36,0.35)] transform scale-90 transition-transform duration-500">
-      <div class="text-4xl mb-2 animate-bounce">🛷✨🦌</div>
-      <h2 class="text-xl font-black text-amber-300 drop-shadow mb-1">任務達成！全數裝載完畢</h2>
-      <p class="text-[11px] text-blue-100 mb-4 leading-relaxed">
-        太優秀了！7 款網路設備已全數裝載上雪橇，聖誕老人準備啟程出發送禮囉！
-      </p>
-
-      <div class="bg-white/10 rounded-2xl p-3 border border-white/15 mb-4 text-center">
-        <div class="text-[10px] text-blue-200 mb-0.5">總花費時間</div>
-        <div id="statTime" class="text-xl font-black text-amber-300 font-mono mb-2">00:45</div>
-        <div class="border-t border-white/15 pt-2">
-          <div class="text-[10px] text-blue-200 mb-1">獲得派送員封號</div>
-          <div id="delivererTitle" class="text-sm font-black text-emerald-300 bg-emerald-950/80 border border-emerald-400/50 py-1.5 px-2 rounded-xl">
-            超光速極光馴鹿派送員 🦌⚡
+      <!-- 派送員可愛稱號卡片 -->
+      <div class="w-full bg-gradient-to-b from-slate-900/90 to-indigo-950/90 border border-amber-400/40 rounded-2xl p-4 my-4 shadow-xl">
+        <div class="text-[10px] font-bold text-amber-300 tracking-wider">獲得特派員榮譽稱號</div>
+        <div id="finish-title" class="text-lg font-black text-white mt-1">超光速極光馴鹿派送員 🦌⚡</div>
+        
+        <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/10">
+          <div class="bg-white/5 rounded-xl p-2">
+            <div class="text-[9px] text-slate-400">總花費時間</div>
+            <div id="finish-time" class="text-base font-black text-cyan-300 font-fun">00:35</div>
           </div>
-          <div id="delivererDesc" class="text-[9px] text-amber-100/90 mt-1">記憶力與手速堪比極光！</div>
+          <div class="bg-white/5 rounded-xl p-2">
+            <div class="text-[9px] text-slate-400">派送成功率</div>
+            <div class="text-base font-black text-emerald-400 font-fun">100%</div>
+          </div>
         </div>
       </div>
 
-      <!-- ZYXEL 聖誕祝福專屬區塊 -->
-      <div class="bg-gradient-to-r from-red-950/70 via-emerald-950/70 to-red-950/70 border border-amber-300/40 rounded-2xl p-3 mb-4 text-center relative overflow-hidden shadow-inner">
-        <div class="text-[11px] font-black tracking-wider text-amber-300 flex items-center justify-center gap-1.5 drop-shadow">
-          <span>🎄</span>
-          <span>ZYXEL 祝大家聖誕快樂</span>
-          <span>✨</span>
+      <!-- ZYXEL 祝大家聖誕快樂專屬區塊 -->
+      <div class="w-full bg-gradient-to-r from-red-950/70 via-emerald-950/70 to-slate-900/80 border border-emerald-400/30 rounded-2xl py-3 px-4 mb-4 shadow-md flex items-center justify-center gap-2">
+        <span class="text-xl">🎄</span>
+        <div class="text-left">
+          <div class="text-xs font-black text-amber-300 tracking-wide">ZYXEL 祝大家聖誕快樂！</div>
+          <div class="text-[10px] text-slate-300 font-medium">高速・穩定・極致連網每一刻 ✨</div>
         </div>
-        <div class="text-[9px] text-emerald-200/90 mt-0.5 font-medium">願高速網路與滿滿溫暖伴您度過美好佳節 🎁❤️</div>
       </div>
 
-      <button id="restartBtn" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 active:scale-95 text-white font-black py-2.5 rounded-xl shadow-lg text-xs transition border border-emerald-300/40">
-        🔄 再挑戰一次
+      <!-- 再玩一次按鈕 -->
+      <button id="btn-replay" class="w-full py-3.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-sm tracking-wide shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-2">
+        <span>🔄</span> 再挑戰一次
       </button>
     </div>
+
+    <!-- 翻牌次數用盡 Toast 浮動提醒 -->
+    <div id="toast-tip" class="absolute top-16 left-1/2 -translate-x-1/2 z-40 bg-rose-600 text-white font-bold text-xs py-1.5 px-4 rounded-full shadow-2xl pointer-events-none transition-all duration-300 opacity-0 -translate-y-2">
+      ⚠️ 翻牌機會已用盡，請憑記憶盲猜拖曳！
+    </div>
+
   </div>
 
   <script>
-    /* 1. 7 款網路設備產品定義 (精美還原向量 SVG) */
-    const PRODUCTS = [
+    /* =====================================================================
+       1. 8 款完整產品資料庫 (每局隨機抽取 6 款生成大禮物盒)
+    ===================================================================== */
+    const ALL_PRODUCTS = [
       {
-        id: 'gs1008hp',
-        name: 'GS1008HP',
-        tag: '8 埠高供電 PoE 交換器',
-        recipient: { role: '智慧園區工程師', avatar: '👷', need: '大功率供電多台攝影機' },
-        svg: `
-          <svg viewBox="0 0 130 80" class="w-full h-full drop-shadow">
-            <rect x="5" y="16" width="120" height="48" rx="3" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.5"/>
-            <text x="65" y="30" font-size="7.5" font-weight="900" fill="#475569" text-anchor="middle" letter-spacing="1.5">ZYXEL</text>
-            <rect x="14" y="36" width="22" height="18" fill="#475569" rx="1"/>
-            <circle cx="18" cy="40" r="1.2" fill="#f59e0b"/>
-            <circle cx="23" cy="40" r="1.2" fill="#22c55e"/>
-            <g fill="#1e293b">
-              <rect x="42" y="38" width="8" height="15" rx="1"/>
-              <rect x="52" y="38" width="8" height="15" rx="1"/>
-              <rect x="62" y="38" width="8" height="15" rx="1"/>
-              <rect x="72" y="38" width="8" height="15" rx="1"/>
-              <rect x="85" y="38" width="8" height="15" rx="1"/>
-              <rect x="95" y="38" width="8" height="15" rx="1"/>
-              <rect x="105" y="38" width="8" height="15" rx="1"/>
-              <rect x="115" y="38" width="8" height="15" rx="1"/>
-            </g>
-          </svg>
-        `
-      },
-      {
-        id: 'usg_lite_60ax',
+        id: 'usg-lite-60ax',
         name: 'USG Lite 60AX',
-        tag: 'AX6000 旗艦資安路由器',
-        recipient: { role: '企業 IT 經理', avatar: '👨‍💼', need: '高速 WiFi 6 與頂級資安防護' },
+        desc: '資安路由器',
+        receiver: { name: '遠距高階主管', avatar: '👔' },
+        boxStyle: { bg: 'bg-[#DC2626]', ribbon: 'bg-[#FDE047]' },
         svg: `
-          <svg viewBox="0 0 100 120" class="w-full h-full drop-shadow">
-            <rect x="22" y="10" width="56" height="96" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-            <path d="M 58 10 Q 78 10 78 30 L 78 18 Q 78 10 70 10 Z" fill="#dc2626"/>
-            <path d="M 64 12 L 76 24 M 68 12 L 77 21" stroke="#fecaca" stroke-width="1"/>
-            <rect x="36" y="106" width="28" height="6" rx="3" fill="#e2e8f0"/>
-            <text x="50" y="78" font-size="8" font-weight="900" fill="#64748b" text-anchor="middle" letter-spacing="1">ZYXEL</text>
-            <circle cx="50" cy="90" r="1.5" fill="#22c55e"/>
+          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="26" y="10" width="48" height="74" rx="14" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+            <path d="M58 10 H68 C71 10 74 13 74 17 V26 C74 20 70 10 58 10 Z" fill="#DC2626"/>
+            <rect x="36" y="84" width="28" height="4" rx="2" fill="#94A3B8"/>
+            <text x="50" y="55" fill="#334155" font-size="7.5" font-weight="900" font-family="sans-serif" text-anchor="middle">ZYXEL</text>
+            <circle cx="50" cy="66" r="1.5" fill="#22C55E"/>
           </svg>
         `
       },
       {
         id: 'nwa30be',
         name: 'NWA30BE',
-        tag: '雙天線極速 WiFi 7 基地台',
-        recipient: { role: '科技新創創辦人', avatar: '👩‍💻', need: '超廣訊號涵蓋與雙天線強效穿透' },
+        desc: '雙頻 Wi-Fi 7 無線基地台',
+        receiver: { name: '文青咖啡廳店長', avatar: '☕' },
+        boxStyle: { bg: 'bg-[#059669]', ribbon: 'bg-[#FDA4AF]' },
         svg: `
-          <svg viewBox="0 0 100 120" class="w-full h-full drop-shadow">
-            <rect x="30" y="6" width="5" height="52" rx="2.5" fill="#cbd5e1"/>
-            <rect x="65" y="6" width="5" height="52" rx="2.5" fill="#cbd5e1"/>
-            <rect x="15" y="52" width="70" height="48" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-            <text x="50" y="76" font-size="7.5" font-weight="900" fill="#64748b" text-anchor="middle" letter-spacing="1">ZYXEL</text>
-            <rect x="34" y="83" width="32" height="2.5" rx="1" fill="#4ade80"/>
+          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="12" width="5" height="42" rx="2.5" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.5"/>
+            <rect x="65" y="12" width="5" height="42" rx="2.5" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.5"/>
+            <rect x="18" y="50" width="64" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+            <text x="50" y="67" fill="#475569" font-size="7.5" font-weight="800" font-family="sans-serif" text-anchor="middle">ZYXEL</text>
+            <rect x="34" y="73" width="32" height="2" rx="1" fill="#10B981"/>
           </svg>
         `
       },
       {
-        id: 'gs105bv5',
-        name: 'GS-105Bv5',
-        tag: '5 埠金屬桌上型交換器',
-        recipient: { role: '電競實況主', avatar: '🎮', need: '零延遲有線連接多台設備' },
+        id: 'gs-108b',
+        name: 'GS-108B',
+        desc: '桌上型8埠交換器',
+        receiver: { name: '電競實況主播', avatar: '🎮' },
+        boxStyle: { bg: 'bg-[#2563EB]', ribbon: 'bg-[#FDE047]' },
         svg: `
-          <svg viewBox="0 0 120 90" class="w-full h-full drop-shadow">
-            <rect x="10" y="15" width="100" height="60" rx="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
-            <text x="60" y="32" font-size="8" font-weight="900" fill="#475569" text-anchor="middle" letter-spacing="1">ZYXEL</text>
-            <g fill="#1e293b">
-              <rect x="18" y="42" width="13" height="18" rx="1.5"/>
-              <rect x="35" y="42" width="13" height="18" rx="1.5"/>
-              <rect x="52" y="42" width="13" height="18" rx="1.5"/>
-              <rect x="69" y="42" width="13" height="18" rx="1.5"/>
-              <rect x="86" y="42" width="13" height="18" rx="1.5"/>
-            </g>
-            <circle cx="98" cy="67" r="1.5" fill="#84cc16"/>
+          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="32" width="80" height="44" rx="4" fill="#CBD5E1" stroke="#64748B" stroke-width="2"/>
+            <text x="50" y="44" fill="#334155" font-size="7.5" font-weight="900" font-family="sans-serif" text-anchor="middle">ZYXEL</text>
+            <rect x="14" y="52" width="7" height="15" rx="1" fill="#1E293B"/>
+            <rect x="23" y="52" width="7" height="15" rx="1" fill="#1E293B"/>
+            <rect x="32" y="52" width="7" height="15" rx="1" fill="#1E293B"/>
+            <rect x="41" y="52" width="7" height="15" rx="1" fill="#1E293B"/>
+            <rect x="51" y="52" width="7" height="15" rx="1" fill="#1E293B"/>
+            <rect x="60" y="52" width="7" height="15" rx="1" fill="#1E293B"/>
+            <rect x="69" y="52" width="7" height="15" rx="1" fill="#1E293B"/>
+            <rect x="78" y="52" width="7" height="15" rx="1" fill="#1E293B"/>
+            <circle cx="82" cy="71" r="1.2" fill="#22C55E"/>
           </svg>
         `
       },
       {
-        id: 'gs1200_10v3',
-        name: 'GS1200-10v3',
-        tag: '8 埠 GbE + 2 埠 SFP 交換器',
-        recipient: { role: '多媒體工作室負責人', avatar: '🎬', need: '高速光纖上行與網管功能' },
+        id: 'gs1100-16s',
+        name: 'GS1100-16S',
+        desc: '無網管型16埠Gigabit交換器',
+        receiver: { name: '智慧園區工程師', avatar: '👷' },
+        boxStyle: { bg: 'bg-[#7C3AED]', ribbon: 'bg-[#FDE047]' },
         svg: `
-          <svg viewBox="0 0 130 80" class="w-full h-full drop-shadow">
-            <rect x="5" y="15" width="120" height="50" rx="3" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.5"/>
-            <text x="65" y="28" font-size="7.5" font-weight="900" fill="#475569" text-anchor="middle" letter-spacing="1.5">ZYXEL</text>
-            <g fill="#1e293b">
-              <rect x="12" y="38" width="7" height="16" rx="1"/>
-              <rect x="21" y="38" width="7" height="16" rx="1"/>
-              <rect x="30" y="38" width="7" height="16" rx="1"/>
-              <rect x="39" y="38" width="7" height="16" rx="1"/>
-              <rect x="50" y="38" width="7" height="16" rx="1"/>
-              <rect x="59" y="38" width="7" height="16" rx="1"/>
-              <rect x="68" y="38" width="7" height="16" rx="1"/>
-              <rect x="77" y="38" width="7" height="16" rx="1"/>
-            </g>
-            <rect x="91" y="36" width="11" height="20" rx="1" fill="#0f172a" stroke="#64748b"/>
-            <rect x="105" y="36" width="11" height="20" rx="1" fill="#0f172a" stroke="#64748b"/>
+          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="34" width="88" height="38" rx="3" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/>
+            <text x="50" y="45" fill="#1E293B" font-size="7.5" font-weight="900" font-family="sans-serif" text-anchor="middle">ZYXEL</text>
+            <rect x="12" y="50" width="48" height="16" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="0.5"/>
+            <!-- 16埠上下兩列點陣 -->
+            <rect x="15" y="52" width="4" height="5" fill="#0F172A"/>
+            <rect x="21" y="52" width="4" height="5" fill="#0F172A"/>
+            <rect x="27" y="52" width="4" height="5" fill="#0F172A"/>
+            <rect x="33" y="52" width="4" height="5" fill="#0F172A"/>
+            <rect x="39" y="52" width="4" height="5" fill="#0F172A"/>
+            <rect x="45" y="52" width="4" height="5" fill="#0F172A"/>
+            <rect x="51" y="52" width="4" height="5" fill="#0F172A"/>
+            <rect x="55" y="52" width="4" height="5" fill="#0F172A"/>
+            <rect x="15" y="59" width="4" height="5" fill="#0F172A"/>
+            <rect x="21" y="59" width="4" height="5" fill="#0F172A"/>
+            <rect x="27" y="59" width="4" height="5" fill="#0F172A"/>
+            <rect x="33" y="59" width="4" height="5" fill="#0F172A"/>
+            <rect x="39" y="59" width="4" height="5" fill="#0F172A"/>
+            <rect x="45" y="59" width="4" height="5" fill="#0F172A"/>
+            <rect x="51" y="59" width="4" height="5" fill="#0F172A"/>
+            <rect x="55" y="59" width="4" height="5" fill="#0F172A"/>
+            <!-- SFP光纖埠 -->
+            <rect x="68" y="51" width="7" height="14" fill="#334155" stroke="#64748B" stroke-width="1"/>
+            <rect x="78" y="51" width="7" height="14" fill="#334155" stroke="#64748B" stroke-width="1"/>
+          </svg>
+        `
+      },
+      {
+        id: 'xmg105',
+        name: 'XMG105',
+        desc: '5 埠 2.5G 無網管交換器',
+        receiver: { name: '機房網路管理員', avatar: '💻' },
+        boxStyle: { bg: 'bg-[#D97706]', ribbon: 'bg-[#5EEAD4]' },
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="34" width="80" height="40" rx="3" fill="#334155" stroke="#64748B" stroke-width="2"/>
+            <text x="50" y="44" fill="#F8FAFC" font-size="7.5" font-weight="900" font-family="sans-serif" text-anchor="middle">ZYXEL</text>
+            <rect x="16" y="50" width="9" height="16" rx="1.5" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+            <rect x="29" y="50" width="9" height="16" rx="1.5" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+            <rect x="42" y="50" width="9" height="16" rx="1.5" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+            <rect x="55" y="50" width="9" height="16" rx="1.5" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+            <rect x="68" y="50" width="9" height="16" rx="1.5" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+            <text x="82" y="62" fill="#38BDF8" font-size="5" font-weight="900">2.5G</text>
           </svg>
         `
       },
       {
         id: 'nwa50be',
         name: 'NWA50BE',
-        tag: '美型吸頂式 WiFi 7 基地台',
-        recipient: { role: '文青咖啡廳店長', avatar: '☕', need: '美型融入裝潢吸頂 AP' },
+        desc: '雙頻 2.5G Wi-Fi7 無線基地台',
+        receiver: { name: '精品飯店營運長', avatar: '🏨' },
+        boxStyle: { bg: 'bg-[#BE185D]', ribbon: 'bg-[#FFFFFF]' },
         svg: `
-          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow">
-            <rect x="10" y="15" width="80" height="70" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-            <text x="50" y="46" font-size="7.5" font-weight="900" fill="#64748b" text-anchor="middle" letter-spacing="1">ZYXEL</text>
-            <rect x="25" y="52" width="50" height="3" rx="1.5" fill="#84cc16"/>
-            <rect x="44" y="85" width="12" height="5" rx="2" fill="#e2e8f0"/>
+          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="18" y="24" width="64" height="52" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+            <text x="50" y="47" fill="#64748B" font-size="7.5" font-weight="800" font-family="sans-serif" text-anchor="middle">ZYXEL</text>
+            <rect x="30" y="52" width="40" height="2" rx="1" fill="#10B981"/>
+            <rect x="46" y="76" width="8" height="3" rx="1.5" fill="#CBD5E1"/>
           </svg>
         `
       },
       {
-        id: 'usg_flex_50h',
+        id: 'usg-flex-50h',
         name: 'USG FLEX 50H',
-        tag: '經典紅邊旗艦資安閘道器',
-        recipient: { role: '跨國商務財務長', avatar: '💼', need: '最高等級企業 VPN 防火牆' },
+        desc: '次世代防火牆',
+        receiver: { name: '總部資安長', avatar: '🛡️' },
+        boxStyle: { bg: 'bg-[#0F766E]', ribbon: 'bg-[#FB7185]' },
         svg: `
-          <svg viewBox="0 0 140 70" class="w-full h-full drop-shadow">
-            <rect x="6" y="18" width="10" height="34" rx="2" fill="#dc2626"/>
-            <line x1="8" y1="21" x2="8" y2="49" stroke="#991b1b" stroke-width="1"/>
-            <line x1="12" y1="21" x2="12" y2="49" stroke="#991b1b" stroke-width="1"/>
-            <rect x="124" y="18" width="10" height="34" rx="2" fill="#dc2626"/>
-            <line x1="128" y1="21" x2="128" y2="49" stroke="#991b1b" stroke-width="1"/>
-            <line x1="132" y1="21" x2="132" y2="49" stroke="#991b1b" stroke-width="1"/>
-            <rect x="16" y="18" width="108" height="34" rx="1" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.2"/>
-            <text x="32" y="32" font-size="6.5" font-weight="900" fill="#334155">ZYXEL</text>
-            <text x="32" y="39" font-size="4" font-weight="600" fill="#64748b">ZyWALL</text>
-            <g fill="#0284c7"><rect x="110" y="27" width="5" height="12" rx="1"/></g>
-            <g fill="#334155">
-              <rect x="65" y="31" width="5" height="6" rx="0.5"/>
-              <rect x="74" y="31" width="5" height="6" rx="0.5"/>
-              <rect x="83" y="31" width="5" height="6" rx="0.5"/>
-              <rect x="92" y="31" width="5" height="6" rx="0.5"/>
-            </g>
+          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="38" width="84" height="28" rx="2" fill="#E2E8F0" stroke="#DC2626" stroke-width="2.5"/>
+            <rect x="8" y="38" width="6" height="28" fill="#DC2626"/>
+            <rect x="86" y="38" width="6" height="28" fill="#DC2626"/>
+            <text x="26" y="48" fill="#0F172A" font-size="6.5" font-weight="900" font-family="sans-serif">ZYXEL</text>
+            <rect x="76" y="44" width="4" height="9" fill="#0284C7"/>
+            <rect x="42" y="50" width="3" height="3" fill="#22C55E"/>
+            <rect x="48" y="50" width="3" height="3" fill="#22C55E"/>
+            <rect x="54" y="50" width="3" height="3" fill="#22C55E"/>
+            <rect x="60" y="50" width="3" height="3" fill="#22C55E"/>
+          </svg>
+        `
+      },
+      {
+        id: 'wax300h',
+        name: 'WAX300H',
+        desc: '牆面嵌入式 無線基地台',
+        receiver: { name: '商務旅宿主管', avatar: '🏢' },
+        boxStyle: { bg: 'bg-[#C2410C]', ribbon: 'bg-[#FEF08A]' },
+        svg: `
+          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 底部弧形桌面立架 -->
+            <path d="M28 78 L26 88 C26 92 31 94 40 94 H60 C69 94 74 92 74 88 L72 78" stroke="#CBD5E1" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <!-- 白色直立主機身 -->
+            <rect x="28" y="10" width="44" height="70" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+            <!-- 環繞散熱微孔線條 -->
+            <rect x="33" y="15" width="34" height="60" rx="9" stroke="#94A3B8" stroke-width="1.2" stroke-dasharray="2 2" fill="none" opacity="0.6"/>
+            <!-- 品牌字樣與燈號 -->
+            <text x="50" y="57" fill="#334155" font-size="6.5" font-weight="900" font-family="sans-serif" text-anchor="middle">ZYXEL</text>
+            <circle cx="50" cy="65" r="1.2" fill="#22C55E"/>
           </svg>
         `
       }
     ];
 
-    /* 截圖中 7 個禮物盒色彩外觀 (上排 4 個 + 下排 3 個) */
-    const BOX_PRESETS = [
-      // 上排 4 個
-      { bg: 'from-rose-600 to-red-700', ribbon: 'bg-amber-300', bow: '#fde047' },       // 紅 / 黃帶
-      { bg: 'from-emerald-700 to-teal-800', ribbon: 'bg-pink-300', bow: '#fde047' },     // 綠 / 粉帶
-      { bg: 'from-blue-600 to-indigo-800', ribbon: 'bg-yellow-300', bow: '#fde047' },    // 藍 / 黃帶
-      { bg: 'from-purple-600 to-violet-800', ribbon: 'bg-yellow-300', bow: '#fde047' },  // 紫 / 黃帶
-      // 下排 3 個
-      { bg: 'from-amber-600 to-yellow-600', ribbon: 'bg-teal-200', bow: '#fde047' },    // 橘 / 青帶
-      { bg: 'from-rose-700 to-pink-800', ribbon: 'bg-white', bow: '#fde047' },          // 桃紅 / 白帶
-      { bg: 'from-teal-700 to-cyan-800', ribbon: 'bg-rose-400', bow: '#fde047' }        // 藍綠 / 橘帶
-    ];
+    /* =====================================================================
+       2. Web Audio API 音效
+    ===================================================================== */
+    let audioCtx = null;
+    let soundEnabled = true;
 
-    /* 2. Web Audio API 音效引擎 */
-    class AudioEngine {
-      constructor() { this.ctx = null; this.enabled = true; }
-      init() {
-        if (!this.ctx) {
-          const AC = window.AudioContext || window.webkitAudioContext;
-          this.ctx = new AC();
-        }
-        if (this.ctx.state === 'suspended') this.ctx.resume();
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
-      playFlip() {
-        if (!this.enabled) return;
-        this.init();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const now = this.ctx.currentTime;
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(320, now);
-        osc.frequency.exponentialRampToValueAtTime(680, now + 0.09);
-        gain.gain.setValueAtTime(0.25, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.1);
-      }
-      playBell() {
-        if (!this.enabled) return;
-        this.init();
-        const now = this.ctx.currentTime;
-        [1200, 1500, 1800].forEach((freq, idx) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now + idx * 0.05);
-          gain.gain.setValueAtTime(0.12, now + idx * 0.05);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.4);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now + idx * 0.05);
-          osc.stop(now + idx * 0.05 + 0.45);
-        });
-      }
-      playSuccess() {
-        if (!this.enabled) return;
-        this.init();
-        const notes = [523.25, 659.25, 783.99, 1046.5];
-        const now = this.ctx.currentTime;
-        notes.forEach((f, i) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(f, now + i * 0.07);
-          gain.gain.setValueAtTime(0.2, now + i * 0.07);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.3);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now + i * 0.07);
-          osc.stop(now + i * 0.07 + 0.35);
-        });
-      }
-      playError() {
-        if (!this.enabled) return;
-        this.init();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const now = this.ctx.currentTime;
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(200, now);
-        osc.frequency.linearRampToValueAtTime(120, now + 0.2);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.2);
-      }
-      playCountdownTick() {
-        if (!this.enabled) return;
-        this.init();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const now = this.ctx.currentTime;
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, now);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.08);
-      }
-      playFanfare() {
-        if (!this.enabled) return;
-        this.init();
-        const tones = [
-          { f: 523, t: 0, d: 0.15 }, { f: 659, t: 0.15, d: 0.15 },
-          { f: 783, t: 0.3, d: 0.15 }, { f: 1046, t: 0.45, d: 0.5 }
-        ];
-        const now = this.ctx.currentTime;
-        tones.forEach(n => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(n.f, now + n.t);
-          gain.gain.setValueAtTime(0.25, now + n.t);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now + n.t);
-          osc.stop(now + n.t + n.d);
-        });
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
       }
     }
-    const audio = new AudioEngine();
 
-    /* 3. 飄雪 Canvas 特效 */
-    const canvas = document.getElementById('snowCanvas');
-    const ctx = canvas.getContext('2d');
-    let flakes = [];
-
-    function resizeSnow() {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-      flakes = [];
-      for (let i = 0; i < 40; i++) {
-        flakes.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          r: Math.random() * 2.2 + 0.8,
-          speedY: Math.random() * 1.1 + 0.4,
-          speedX: Math.random() * 0.6 - 0.3,
-          alpha: Math.random() * 0.6 + 0.35,
-          wobble: Math.random() * Math.PI * 2
-        });
-      }
+    function playTone(freq, type = 'sine', duration = 0.15, vol = 0.25) {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
     }
-    function renderSnow() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      flakes.forEach(f => {
-        f.wobble += 0.02;
-        f.y += f.speedY;
-        f.x += Math.sin(f.wobble) * 0.4 + f.speedX;
-        if (f.y > canvas.height) { f.y = -4; f.x = Math.random() * canvas.width; }
-        if (f.x > canvas.width) f.x = 0;
-        if (f.x < 0) f.x = canvas.width;
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${f.alpha})`;
-        ctx.fill();
+
+    function soundFlip() { playTone(523.25, 'sine', 0.1, 0.2); }
+    function soundSuccess() {
+      if (!soundEnabled || !audioCtx) return;
+      [523.25, 659.25, 783.99, 1046.50].forEach((f, idx) => {
+        setTimeout(() => playTone(f, 'triangle', 0.25, 0.25), idx * 70);
       });
-      requestAnimationFrame(renderSnow);
     }
-    window.addEventListener('resize', resizeSnow);
-
-    /* 4. 遊戲狀態與流程 */
-    let stageSequence = [];
-    let currentRound = 0;
-    let timerSeconds = 0;
-    let timerInterval = null;
-    let completedProducts = [];
-    let remainingFlips = 3;
-    let isMemorizingPhase = false;
-    let shuffledBoxes = [];
-
-    // DOM 快取
-    const progressText = document.getElementById('progressText');
-    const chancesText = document.getElementById('chancesText');
-    const timerText = document.getElementById('timerText');
-    const targetProductGraphic = document.getElementById('targetProductGraphic');
-    const targetProductName = document.getElementById('targetProductName');
-    const targetProductTag = document.getElementById('targetProductTag');
-    const recipientAvatar = document.getElementById('recipientAvatar');
-    const recipientRole = document.getElementById('recipientRole');
-    const roundBadge = document.getElementById('roundBadge');
-    const sleighDropZone = document.getElementById('sleighDropZone');
-    const sleighCargoList = document.getElementById('sleighCargoList');
-    const topRowGifts = document.getElementById('topRowGifts');
-    const bottomRowGifts = document.getElementById('bottomRowGifts');
-    const hintBanner = document.getElementById('hintBanner');
-    const soundBtn = document.getElementById('soundBtn');
-    const victoryModal = document.getElementById('victoryModal');
-    const restartBtn = document.getElementById('restartBtn');
-    const statTime = document.getElementById('statTime');
-    const delivererTitle = document.getElementById('delivererTitle');
-    const delivererDesc = document.getElementById('delivererDesc');
-    const memorizeOverlay = document.getElementById('memorizeOverlay');
-    const countdownNum = document.getElementById('countdownNum');
-    const startModal = document.getElementById('startModal');
-    const startGameBtn = document.getElementById('startGameBtn');
-    const noticeBanner = document.getElementById('noticeBanner');
-    const noticeBannerText = document.getElementById('noticeBannerText');
-
-    soundBtn.addEventListener('click', () => {
-      audio.enabled = !audio.enabled;
-      soundBtn.textContent = audio.enabled ? '🔔' : '🔕';
-      soundBtn.classList.toggle('opacity-50', !audio.enabled);
-      showToast(audio.enabled ? '音效已開啟 🔔' : '音效已靜音 🔕');
-    });
-
-    startGameBtn.addEventListener('click', () => {
-      audio.init();
-      audio.playBell();
-      startModal.classList.add('opacity-0', 'pointer-events-none');
-      setTimeout(() => startModal.style.display = 'none', 300);
-      initGame();
-    });
-
-    function initGame() {
-      currentRound = 0;
-      timerSeconds = 0;
-      completedProducts = [];
-      sleighCargoList.innerHTML = '';
-      sleighDropZone.classList.remove('sleigh-flying');
-      victoryModal.classList.add('opacity-0', 'pointer-events-none');
-      victoryModal.querySelector('div').classList.remove('scale-100');
-
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        if (!isMemorizingPhase) {
-          timerSeconds++;
-          const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-          const secs = String(timerSeconds % 60).padStart(2, '0');
-          timerText.textContent = `${mins}:${secs}`;
-        }
-      }, 1000);
-
-      stageSequence = [...PRODUCTS].sort(() => 0.5 - Math.random());
-      shuffledBoxes = [...PRODUCTS].sort(() => 0.5 - Math.random());
-
-      startMemorizeCountdown(() => {
-        setupRound();
+    function soundWrong() {
+      if (!soundEnabled || !audioCtx) return;
+      playTone(220, 'sawtooth', 0.25, 0.2);
+    }
+    function soundTick() { playTone(880, 'sine', 0.08, 0.2); }
+    function soundVictory() {
+      if (!soundEnabled || !audioCtx) return;
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      notes.forEach((f, idx) => {
+        setTimeout(() => playTone(f, 'sine', 0.4, 0.3), idx * 100);
       });
     }
 
-    function startMemorizeCountdown(onComplete) {
-      isMemorizingPhase = true;
-      renderGiftBoxes(true);
+    /* =====================================================================
+       3. 遊戲狀態
+    ===================================================================== */
+    const GAME_BOX_COUNT = 6;     // 盤面上大禮物盒數量改為 6 個
+    let activeProducts = [];       // 從 8 款中隨機選出的 6 款產品
+    let currentLevel = 0;
+    let roundOrder = [];
+    let gridCards = [];
+    let flipsLeft = 3;
+    let isMemoryPhase = false;
+    let gameTimer = null;
+    let secondsElapsed = 0;
+    let isDragging = false;
+    let draggedItem = null;
 
-      const modalBox = memorizeOverlay.querySelector('div');
-      memorizeOverlay.classList.remove('opacity-0');
-      memorizeOverlay.classList.add('opacity-100');
-      modalBox.classList.remove('scale-90');
-      modalBox.classList.add('scale-100');
+    /* DOM 節點 */
+    const giftsGrid = document.getElementById('gifts-grid');
+    const sleighZone = document.getElementById('sleigh-zone');
+    const dragProxy = document.getElementById('drag-proxy');
+    const proxySvgBox = document.getElementById('proxy-svg-box');
+    const proxyTitle = document.getElementById('proxy-title');
+    const heartsWrap = document.getElementById('hearts-wrap');
+    const progressText = document.getElementById('progress-text');
+    const timerText = document.getElementById('timer-text');
+    const wishSvg = document.getElementById('wish-svg-container');
+    const wishName = document.getElementById('wish-product-name');
+    const wishDesc = document.getElementById('wish-desc');
+    const receiverAvatar = document.getElementById('receiver-avatar');
+    const receiverName = document.getElementById('receiver-name');
+    const wishBadge = document.getElementById('wish-badge');
+    const countdownModal = document.getElementById('countdown-modal');
+    const countdownNumber = document.getElementById('countdown-number');
+    const startModal = document.getElementById('start-modal');
+    const finishModal = document.getElementById('finish-modal');
+    const finishTitle = document.getElementById('finish-title');
+    const finishTime = document.getElementById('finish-time');
+    const toastTip = document.getElementById('toast-tip');
 
-      let count = 5;
-      countdownNum.textContent = count;
-      audio.playCountdownTick();
-
-      const cdInterval = setInterval(() => {
-        count--;
-        if (count > 0) {
-          countdownNum.textContent = count;
-          audio.playCountdownTick();
-        } else {
-          clearInterval(cdInterval);
-          modalBox.classList.remove('scale-100');
-          modalBox.classList.add('scale-90');
-          memorizeOverlay.classList.remove('opacity-100');
-          memorizeOverlay.classList.add('opacity-0');
-          isMemorizingPhase = false;
-          audio.playFlip();
-
-          document.querySelectorAll('.flip-card-inner').forEach(inner => inner.classList.remove('flipped'));
-
-          noticeBanner.classList.remove('opacity-0');
-          noticeBannerText.textContent = '⏰ 時間到！禮物已蓋上，遊戲正式開始！';
-
-          showToast('⏰ 時間到！禮物已蓋上，遊戲正式開始！', 'info');
-          if (onComplete) onComplete();
-        }
-      }, 1000);
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
     }
 
-    function updateChancesUI() {
-      const hearts = ['已用盡 🚫', '❤️🖤🖤', '❤️❤️🖤', '❤️❤️❤️'];
-      chancesText.textContent = hearts[remainingFlips] !== undefined ? hearts[remainingFlips] : '已用盡 🚫';
+    function initGameData() {
+      // 從 8 款完整產品中，隨機選取 6 款作為本次遊戲關卡
+      activeProducts = shuffleArray(ALL_PRODUCTS).slice(0, GAME_BOX_COUNT);
+      roundOrder = shuffleArray([...Array(GAME_BOX_COUNT).keys()]);
+      currentLevel = 0;
+      secondsElapsed = 0;
+      updateTimerDisplay();
+
+      // 將這 6 款產品打亂放置在盤面的 6 個大禮物盒中
+      gridCards = shuffleArray(activeProducts).map((p, idx) => ({
+        ...p,
+        gridIndex: idx,
+        isFlipped: false,
+        isCompleted: false
+      }));
     }
 
-    function setupRound() {
-      remainingFlips = 3;
-      updateChancesUI();
+    /* =====================================================================
+       4. 渲染 6 個大尺寸禮物盒 (3 x 2 排版，尺寸更寬敞，無鏡像與溢出)
+    ===================================================================== */
+    function renderGrid() {
+      giftsGrid.innerHTML = '';
 
-      const currentTarget = stageSequence[currentRound];
-      progressText.textContent = `${currentRound} / 7`;
-      roundBadge.textContent = `第 ${currentRound + 1} 位`;
-      recipientAvatar.textContent = currentTarget.recipient.avatar;
-      recipientRole.textContent = currentTarget.recipient.role;
+      gridCards.forEach((card, idx) => {
+        const cardEl = document.createElement('div');
+        // 3 欄排版，每格比例方形，大幅增加點擊與顯示空間
+        cardEl.className = `aspect-square relative touch-none cursor-pointer w-full ${card.isCompleted ? 'opacity-30 pointer-events-none' : ''}`;
+        cardEl.dataset.index = idx;
 
-      targetProductGraphic.innerHTML = currentTarget.svg;
-      targetProductName.textContent = currentTarget.name;
-      targetProductTag.textContent = currentTarget.tag;
-      hintBanner.textContent = '每輪限翻牌 3 次！次數用盡可直接「盲猜拖曳」未掀蓋禮物盒上雪橇！';
-
-      renderGiftBoxes(false);
-    }
-
-    /* 渲染上排 4 個 + 下排 3 個禮物盒 (精確重現截圖外型) */
-    function renderGiftBoxes(forceOpenAll = false) {
-      topRowGifts.innerHTML = '';
-      bottomRowGifts.innerHTML = '';
-
-      shuffledBoxes.forEach((item, idx) => {
-        const design = BOX_PRESETS[idx % BOX_PRESETS.length];
-        const isAlreadyLoaded = completedProducts.includes(item.id);
-
-        const card = document.createElement('div');
-        card.className = `perspective-box h-24 sm:h-28 ${isAlreadyLoaded ? 'opacity-25 pointer-events-none' : ''}`;
-        card.setAttribute('data-product-id', item.id);
-
-        card.innerHTML = `
-          <div class="flip-card-inner w-full h-full relative rounded-2xl shadow-lg border border-white/20 ${forceOpenAll ? 'flipped' : ''}">
+        cardEl.innerHTML = `
+          <div class="gift-card-inner ${card.isFlipped ? 'flipped' : ''}">
             
-            <!-- 正面：截圖同款多彩禮盒外觀 -->
-            <div class="flip-card-front absolute inset-0 bg-gradient-to-br ${design.bg} rounded-2xl p-1 flex flex-col items-center justify-center border-2 border-white/30 cursor-pointer overflow-hidden shadow-md">
-              <!-- 十字緞帶 -->
-              <div class="absolute inset-x-0 h-3 ${design.ribbon} top-1/2 -translate-y-1/2 shadow-inner"></div>
-              <div class="absolute inset-y-0 w-3 ${design.ribbon} left-1/2 -translate-x-1/2 shadow-inner"></div>
-              
-              <!-- 經典金色立體蝴蝶結 -->
-              <div class="relative z-10 w-8 h-8 drop-shadow pointer-events-none">
-                <svg viewBox="0 0 32 32" class="w-full h-full">
-                  <ellipse cx="10" cy="12" rx="7" ry="5" fill="${design.bow}" transform="rotate(-20 10 12)"/>
-                  <ellipse cx="22" cy="12" rx="7" ry="5" fill="${design.bow}" transform="rotate(20 22 12)"/>
-                  <circle cx="16" cy="14" r="4.2" fill="#d97706"/>
-                </svg>
+            <!-- 正面：經典十字緞帶禮物盒 (大號黃金蝴蝶結與黑底盲拖標籤) -->
+            <div class="face-front ${card.boxStyle.bg} border-2 border-white/20 p-1.5 flex flex-col items-center justify-center shadow-lg">
+              <div class="absolute inset-x-0 h-3.5 ${card.boxStyle.ribbon} top-1/2 -translate-y-1/2 shadow-sm pointer-events-none"></div>
+              <div class="absolute inset-y-0 w-3.5 ${card.boxStyle.ribbon} left-1/2 -translate-x-1/2 shadow-sm pointer-events-none"></div>
+              <!-- 蝴蝶結標誌 -->
+              <div class="w-6 h-6 rounded-full bg-[#FBBF24] border border-white flex items-center justify-center text-xs shadow z-10 -mb-0.5 pointer-events-none">
+                🎀
               </div>
-
-              <!-- 截圖同款白色標籤：「點擊/盲拖」 -->
-              <span class="relative z-10 text-[9px] font-black text-black bg-white/95 px-2 py-0.5 rounded-full mt-1.5 shadow pointer-events-none">點擊/盲拖</span>
+              <!-- 點擊/盲拖膠囊 -->
+              <div class="bg-black/75 rounded-md px-2 py-0.5 z-10 border border-white/35 mt-1 pointer-events-none shadow-sm">
+                <span class="text-[9.5px] sm:text-[10.5px] font-black text-white whitespace-nowrap block leading-tight">點擊/盲拖</span>
+              </div>
             </div>
 
-            <!-- 背面：翻開展示設備卡片 (可拖曳) -->
-            <div class="flip-card-back absolute inset-0 bg-gradient-to-b from-slate-900 to-slate-950 rounded-2xl border-2 border-amber-300 p-1 flex flex-col items-center justify-between cursor-grab active:cursor-grabbing shadow-inner">
-              <div class="w-full flex-1 p-0.5 flex items-center justify-center pointer-events-none">
-                ${item.svg}
+            <!-- 背面：翻開展示設備 (充足空間，完美包覆於卡片內絕不溢出) -->
+            <div class="face-back bg-slate-900 border-2 border-cyan-400 p-1.5 flex flex-col items-center justify-between shadow-inner">
+              <div class="w-full flex-1 flex items-center justify-center min-h-0 p-1">
+                ${card.svg}
               </div>
-              <div class="w-full text-center bg-black/60 rounded-xl py-0.5 px-1 border-t border-white/10 pointer-events-none">
-                <div class="text-[9px] font-black text-amber-300 truncate">${item.name}</div>
-                <div class="text-[8px] text-emerald-400 font-bold flex items-center justify-center gap-0.5">
-                  <span>✋ 拖曳</span>
-                </div>
+              <!-- 底部型號與拖曳提示標籤：自帶內襯防溢出 -->
+              <div class="w-full bg-slate-950/90 rounded-md py-1 px-1 text-center flex-shrink-0 border border-white/10 mt-1">
+                <div class="text-[9.5px] sm:text-[10.5px] font-black text-amber-300 truncate w-full leading-tight">${card.name}</div>
+                <div class="text-[8px] text-cyan-400 font-bold leading-none mt-0.5">👆 按住拖曳</div>
               </div>
             </div>
 
           </div>
         `;
 
-        if (!forceOpenAll) {
-          bindGiftInteraction(card, item, design);
-        }
-
-        // 上排 4 個，下排 3 個
-        if (idx < 4) {
-          topRowGifts.appendChild(card);
-        } else {
-          bottomRowGifts.appendChild(card);
-        }
+        setupCardInteraction(cardEl, card);
+        giftsGrid.appendChild(cardEl);
       });
     }
 
-    /* 綁定翻牌與支援盲猜拖曳互動 */
-    function bindGiftInteraction(card, product, design) {
-      const inner = card.querySelector('.flip-card-inner');
+    function renderHearts() {
+      let heartsHtml = '';
+      for (let i = 0; i < 3; i++) {
+        heartsHtml += i < flipsLeft ? '<span>❤️</span>' : '<span class="opacity-25">🤍</span>';
+      }
+      heartsWrap.innerHTML = heartsHtml;
+    }
 
-      card.addEventListener('click', () => {
-        if (isMemorizingPhase) return;
-        if (card.dataset.dragging === 'true') return;
+    function renderWish() {
+      const targetIndex = roundOrder[currentLevel];
+      const targetProd = activeProducts[targetIndex];
 
-        if (!inner.classList.contains('flipped')) {
-          if (remainingFlips > 0) {
-            remainingFlips--;
-            updateChancesUI();
-            inner.classList.add('flipped');
-            audio.playFlip();
+      progressText.textContent = `${currentLevel} / ${GAME_BOX_COUNT}`;
+      wishSvg.innerHTML = targetProd.svg;
+      wishName.textContent = targetProd.name;
+      wishDesc.textContent = targetProd.desc;
 
-            if (remainingFlips === 0) {
-              showToast('⚠️ 翻牌次數已用盡！請憑記憶直接盲猜拖曳禮物盒！', 'error');
-              hintBanner.textContent = '⚠️ 翻牌已用盡！可直接長按並拖曳未翻開的禮物盒進行盲猜！';
-            }
-          } else {
-            showToast('⚠️ 翻牌次數已用盡！請直接按住盲猜拖曳至雪橇！', 'error');
-          }
-        }
-      });
+      receiverAvatar.textContent = targetProd.receiver.avatar;
+      receiverName.textContent = targetProd.receiver.name;
+      wishBadge.textContent = `第 ${currentLevel + 1} 位`;
+    }
 
-      card.addEventListener('pointerdown', (e) => {
-        if (isMemorizingPhase) return;
+    /* =====================================================================
+       5. 拖曳與翻牌操作
+    ===================================================================== */
+    let startX = 0, startY = 0;
+    let hasMoved = false;
 
-        const startX = e.clientX;
-        const startY = e.clientY;
-        let isDragActive = false;
-        let cloneElem = null;
-        const isFlipped = inner.classList.contains('flipped');
-
-        function onPointerMove(moveEvt) {
-          const dist = Math.hypot(moveEvt.clientX - startX, moveEvt.clientY - startY);
-
-          if (!isDragActive && dist > 6) {
-            isDragActive = true;
-            card.dataset.dragging = 'true';
-            audio.playBell();
-
-            cloneElem = document.createElement('div');
-            cloneElem.className = 'floating-drag-item w-20 h-20 rounded-2xl p-1.5 flex flex-col items-center justify-center text-center shadow-2xl';
-
-            if (isFlipped) {
-              cloneElem.classList.add('bg-slate-900/95', 'border-2', 'border-amber-300');
-              cloneElem.innerHTML = `
-                <div class="w-full h-12 flex items-center justify-center">${product.svg}</div>
-                <div class="text-[9px] font-black text-amber-300 truncate max-w-[70px] mt-0.5">${product.name}</div>
-              `;
-            } else {
-              cloneElem.classList.add('bg-gradient-to-br', ...design.bg.split(' '), 'border-2', 'border-white');
-              cloneElem.innerHTML = `
-                <div class="text-2xl">🎁</div>
-                <div class="text-[9px] font-black text-black bg-white px-2 py-0.2 rounded-full mt-1">盲猜禮物</div>
-              `;
-            }
-
-            document.body.appendChild(cloneElem);
-            card.classList.add('opacity-30');
-          }
-
-          if (isDragActive && cloneElem) {
-            cloneElem.style.left = `${moveEvt.clientX}px`;
-            cloneElem.style.top = `${moveEvt.clientY}px`;
-
-            const sleighRect = sleighDropZone.getBoundingClientRect();
-            const inSleigh = (
-              moveEvt.clientX >= sleighRect.left &&
-              moveEvt.clientX <= sleighRect.right &&
-              moveEvt.clientY >= sleighRect.top &&
-              moveEvt.clientY <= sleighRect.bottom
-            );
-
-            sleighDropZone.classList.toggle('scale-105', inSleigh);
-            sleighDropZone.classList.toggle('border-yellow-200', inSleigh);
-          }
-        }
-
-        function onPointerUp(upEvt) {
-          window.removeEventListener('pointermove', onPointerMove);
-          window.removeEventListener('pointerup', onPointerUp);
-          window.removeEventListener('pointercancel', onPointerUp);
-
-          if (isDragActive) {
-            const sleighRect = sleighDropZone.getBoundingClientRect();
-            const inSleigh = (
-              upEvt.clientX >= sleighRect.left &&
-              upEvt.clientX <= sleighRect.right &&
-              upEvt.clientY >= sleighRect.top &&
-              upEvt.clientY <= sleighRect.bottom
-            );
-
-            sleighDropZone.classList.remove('scale-105', 'border-yellow-200');
-
-            if (inSleigh) {
-              handleDropVerification(product, card, cloneElem, inner);
-            } else {
-              if (cloneElem) cloneElem.remove();
-              card.classList.remove('opacity-30');
-            }
-
-            setTimeout(() => { card.dataset.dragging = 'false'; }, 100);
-          }
-        }
+    function setupCardInteraction(el, card) {
+      el.addEventListener('pointerdown', (e) => {
+        if (isMemoryPhase || card.isCompleted) return;
+        startX = e.clientX;
+        startY = e.clientY;
+        hasMoved = false;
+        draggedItem = card;
 
         window.addEventListener('pointermove', onPointerMove);
         window.addEventListener('pointerup', onPointerUp);
-        window.addEventListener('pointercancel', onPointerUp);
       });
+
+      function onPointerMove(e) {
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        if (!hasMoved && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+          hasMoved = true;
+          isDragging = true;
+
+          dragProxy.style.display = 'flex';
+          if (draggedItem.isFlipped) {
+            proxySvgBox.innerHTML = draggedItem.svg;
+            proxyTitle.textContent = draggedItem.name;
+            dragProxy.className = "w-24 h-24 rounded-2xl flex flex-col items-center justify-center p-2 border-2 border-cyan-400 bg-slate-900/90 backdrop-blur-md shadow-2xl";
+          } else {
+            proxySvgBox.innerHTML = '<span class="text-3xl animate-bounce">🎁</span>';
+            proxyTitle.textContent = "盲猜此禮盒";
+            dragProxy.className = "w-24 h-24 rounded-2xl flex flex-col items-center justify-center p-2 border-2 border-amber-400 bg-red-950/90 backdrop-blur-md shadow-2xl";
+          }
+          sleighZone.classList.add('sleigh-highlight');
+        }
+
+        if (isDragging) {
+          dragProxy.style.left = `${e.clientX}px`;
+          dragProxy.style.top = `${e.clientY}px`;
+        }
+      }
+
+      function onPointerUp(e) {
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+
+        if (isDragging) {
+          isDragging = false;
+          dragProxy.style.display = 'none';
+          sleighZone.classList.remove('sleigh-highlight');
+
+          const sleighRect = sleighZone.getBoundingClientRect();
+          const inSleigh = (
+            e.clientX >= sleighRect.left &&
+            e.clientX <= sleighRect.right &&
+            e.clientY >= sleighRect.top &&
+            e.clientY <= sleighRect.bottom
+          );
+
+          if (inSleigh) {
+            handleDropOnSleigh(draggedItem);
+          } else {
+            soundWrong();
+          }
+        } else if (!hasMoved) {
+          handleClickCard(card);
+        }
+      }
     }
 
-    function handleDropVerification(product, card, cloneElem, inner) {
-      const currentTarget = stageSequence[currentRound];
+    function handleClickCard(card) {
+      if (card.isFlipped) return;
 
-      if (product.id === currentTarget.id) {
-        audio.playSuccess();
-        triggerSparks(sleighDropZone);
-        completedProducts.push(product.id);
+      if (flipsLeft > 0) {
+        flipsLeft--;
+        card.isFlipped = true;
+        soundFlip();
+        renderHearts();
+        renderGrid();
 
-        if (cloneElem) cloneElem.remove();
-        inner.classList.add('flipped');
-        card.classList.add('opacity-25', 'pointer-events-none');
-
-        const badge = document.createElement('div');
-        badge.className = 'w-8 h-8 bg-black/40 backdrop-blur rounded-xl border border-amber-300 p-0.5 flex items-center justify-center transform scale-0 transition-transform duration-300 shadow';
-        badge.innerHTML = product.svg;
-        badge.title = product.name;
-        sleighCargoList.appendChild(badge);
-        setTimeout(() => badge.classList.remove('scale-0'), 40);
-
-        showToast(`🎉 太神了！成功送達「${product.name}」！`, 'success');
-
-        currentRound++;
-        progressText.textContent = `${currentRound} / 7`;
-
-        if (currentRound >= 7) {
-          finishGame();
-        } else {
-          setTimeout(() => { setupRound(); }, 750);
+        if (flipsLeft === 0) {
+          showToast('⚠️ 翻牌次數已用盡！請憑記憶直接盲猜拖曳！');
         }
       } else {
-        audio.playError();
-        if (cloneElem) cloneElem.remove();
-        card.classList.remove('opacity-30');
-
-        sleighDropZone.classList.add('animate-bounce');
-        setTimeout(() => sleighDropZone.classList.remove('animate-bounce'), 400);
-
-        showToast(`❌ 猜錯囉！不是這台，請再試試其他禮物盒！`, 'error');
+        showToast('⚠️ 翻牌次數已用盡！請憑記憶直接盲猜拖曳禮盒！');
+        soundWrong();
       }
     }
 
-    function getDelivererRank(seconds) {
-      if (seconds < 35) {
-        return {
-          title: '超光速極光馴鹿派送員 🦌⚡',
-          desc: '秒速記憶、手速如神！聖誕老人都要向你拜師！'
-        };
-      } else if (seconds <= 55) {
-        return {
-          title: '暖心特快車雪橇神手 🛷✨',
-          desc: '精準敏捷又俐落！禮物送達速度無可挑剔！'
-        };
-      } else if (seconds <= 80) {
-        return {
-          title: '精準零失誤禮物精靈 🧝🎁',
-          desc: '沉著應對每份願望，細心裝載百分百滿分！'
-        };
-      } else if (seconds <= 110) {
-        return {
-          title: '悠閒漫步雪國漫遊者 ⛄❄️',
-          desc: '一邊賞雪一邊送禮，溫馨歡樂氣氛拉滿！'
-        };
+    function handleDropOnSleigh(card) {
+      const targetProd = activeProducts[roundOrder[currentLevel]];
+
+      if (card.id === targetProd.id) {
+        card.isFlipped = true;
+        card.isCompleted = true;
+        soundSuccess();
+        triggerSparks(sleighZone);
+        renderGrid();
+
+        setTimeout(() => {
+          if (currentLevel < GAME_BOX_COUNT - 1) {
+            currentLevel++;
+            flipsLeft = 3;
+            renderHearts();
+            renderWish();
+          } else {
+            currentLevel = GAME_BOX_COUNT;
+            progressText.textContent = `${currentLevel} / ${GAME_BOX_COUNT}`;
+            finishGame();
+          }
+        }, 600);
       } else {
-        return {
-          title: '佛系觀光聖誕老公公 🎅🎄',
-          desc: '不疾不徐悠哉漫遊，心意滿滿最珍貴！'
-        };
+        soundWrong();
+        showToast('❌ 這不是此角色想要的設備喔，再試試看！');
       }
     }
 
-    function triggerSparks(targetElem) {
-      const rect = targetElem.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
+    let toastTimeout = null;
+    function showToast(msg) {
+      clearTimeout(toastTimeout);
+      toastTip.textContent = msg;
+      toastTip.classList.remove('opacity-0', '-translate-y-2');
+      toastTip.classList.add('opacity-100', 'translate-y-0');
+      toastTimeout = setTimeout(() => {
+        toastTip.classList.remove('opacity-100', 'translate-y-0');
+        toastTip.classList.add('opacity-0', '-translate-y-2');
+      }, 2200);
+    }
 
-      for (let i = 0; i < 22; i++) {
-        const p = document.createElement('div');
-        p.className = 'fixed rounded-full pointer-events-none z-50';
-        const sz = Math.random() * 6 + 3;
-        p.style.width = `${sz}px`;
-        p.style.height = `${sz}px`;
-        p.style.backgroundColor = ['#fde047', '#38bdf8', '#ef4444', '#4ade80', '#ffffff'][Math.floor(Math.random() * 5)];
-        p.style.left = `${cx}px`;
-        p.style.top = `${cy}px`;
-        document.body.appendChild(p);
+    /* =====================================================================
+       6. 5 秒記憶倒數
+    ===================================================================== */
+    function startMemoryCountDown(callback) {
+      isMemoryPhase = true;
+      gridCards.forEach(c => c.isFlipped = true);
+      renderGrid();
 
-        const rad = Math.random() * Math.PI * 2;
-        const dist = Math.random() * 110 + 40;
-        const tx = Math.cos(rad) * dist;
-        const ty = Math.sin(rad) * dist - 40;
+      countdownModal.classList.remove('hidden');
+      let count = 5;
+      countdownNumber.textContent = count;
+      soundTick();
 
-        p.animate([
-          { transform: 'translate(0,0) scale(1)', opacity: 1 },
-          { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
-        ], {
-          duration: 700 + Math.random() * 300,
-          easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
-        }).onfinish = () => p.remove();
-      }
+      const timer = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownNumber.textContent = count;
+          soundTick();
+        } else {
+          clearInterval(timer);
+          countdownModal.classList.add('hidden');
+          gridCards.forEach(c => c.isFlipped = false);
+          renderGrid();
+          isMemoryPhase = false;
+          callback();
+        }
+      }, 1000);
+    }
+
+    /* =====================================================================
+       7. 計時與結算
+    ===================================================================== */
+    function startTimer() {
+      clearInterval(gameTimer);
+      gameTimer = setInterval(() => {
+        secondsElapsed++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+      const s = String(secondsElapsed % 60).padStart(2, '0');
+      timerText.textContent = `${m}:${s}`;
+    }
+
+    function getCuteCourierTitle(seconds) {
+      if (seconds <= 30) return '超光速極光馴鹿派送員 🦌⚡';
+      if (seconds <= 50) return '暖心特快車雪橇神手 🛷✨';
+      if (seconds <= 75) return '精準零失誤禮物精靈 🧝🎁';
+      if (seconds <= 105) return '悠閒漫步雪國漫遊者 ⛄❄️';
+      return '佛系觀光聖誕老公公 🎅🎄';
     }
 
     function finishGame() {
-      clearInterval(timerInterval);
-      audio.playFanfare();
+      clearInterval(gameTimer);
+      soundVictory();
 
-      const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-      const secs = String(timerSeconds % 60).padStart(2, '0');
-      statTime.textContent = `${mins}:${secs}`;
+      const m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+      const s = String(secondsElapsed % 60).padStart(2, '0');
+      finishTime.textContent = `${m}:${s}`;
+      finishTitle.textContent = getCuteCourierTitle(secondsElapsed);
 
-      const rankInfo = getDelivererRank(timerSeconds);
-      delivererTitle.textContent = rankInfo.title;
-      delivererDesc.textContent = rankInfo.desc;
-
-      sleighDropZone.classList.add('sleigh-flying');
-      showToast('🌟 7 款設備全數裝載完畢！雪橇起飛！', 'success');
-
-      setTimeout(() => {
-        victoryModal.classList.remove('opacity-0', 'pointer-events-none');
-        victoryModal.classList.add('opacity-100');
-        victoryModal.querySelector('div').classList.add('scale-100');
-      }, 1500);
+      finishModal.classList.remove('hidden');
     }
 
-    let toastTimer = null;
-    function showToast(msg, type = 'info') {
-      const toast = document.getElementById('toast');
-      const toastIcon = document.getElementById('toastIcon');
-      const toastMsg = document.getElementById('toastMsg');
-      clearTimeout(toastTimer);
+    function triggerSparks(parentEl) {
+      const rect = parentEl.getBoundingClientRect();
+      const count = 18;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'fixed pointer-events-none rounded-full z-50';
+        const size = Math.random() * 8 + 4;
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.backgroundColor = ['#FBBF24', '#34D399', '#F43F5E', '#38BDF8', '#FFF'][Math.floor(Math.random() * 5)];
+        p.style.left = `${rect.left + rect.width / 2}px`;
+        p.style.top = `${rect.top + rect.height / 2}px`;
+        document.body.appendChild(p);
 
-      toastMsg.textContent = msg;
-      toast.className = 'fixed top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 px-3.5 py-1.5 rounded-2xl text-xs font-black shadow-2xl flex items-center gap-1.5 border whitespace-nowrap';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * 80 + 30;
+        const targetX = Math.cos(angle) * dist;
+        const targetY = Math.sin(angle) * dist;
 
-      if (type === 'success') {
-        toast.classList.add('bg-emerald-600/95', 'text-white', 'border-emerald-300');
-        toastIcon.textContent = '✨';
-      } else if (type === 'error') {
-        toast.classList.add('bg-rose-600/95', 'text-white', 'border-rose-300');
-        toastIcon.textContent = '⚠️';
-      } else {
-        toast.classList.add('bg-blue-600/95', 'text-white', 'border-blue-300');
-        toastIcon.textContent = '💡';
+        const anim = p.animate([
+          { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+          { transform: `translate(${targetX}px, ${targetY}px) scale(0)`, opacity: 0 }
+        ], {
+          duration: 650,
+          easing: 'cubic-bezier(0, .9, .57, 1)'
+        });
+
+        anim.onfinish = () => p.remove();
       }
-
-      toast.classList.remove('opacity-0', '-translate-y-3');
-      toast.classList.add('opacity-100', 'translate-y-0');
-
-      toastTimer = setTimeout(() => {
-        toast.classList.remove('opacity-100', 'translate-y-0');
-        toast.classList.add('opacity-0', '-translate-y-3');
-      }, 2000);
     }
 
-    restartBtn.addEventListener('click', () => {
-      audio.playFlip();
-      initGame();
+    /* =====================================================================
+       8. 經典夜空星芒與飄雪特效
+    ===================================================================== */
+    const snowCanvas = document.getElementById('snow-canvas');
+    const ctx = snowCanvas.getContext('2d');
+    let flakes = [];
+
+    function resizeSnowCanvas() {
+      snowCanvas.width = snowCanvas.parentElement.clientWidth;
+      snowCanvas.height = snowCanvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeSnowCanvas);
+
+    function initSnow() {
+      resizeSnowCanvas();
+      flakes = [];
+      const numFlakes = 42;
+      for (let i = 0; i < numFlakes; i++) {
+        flakes.push({
+          x: Math.random() * snowCanvas.width,
+          y: Math.random() * snowCanvas.height,
+          radius: Math.random() * 2.2 + 0.8,
+          speed: Math.random() * 0.8 + 0.3,
+          wind: Math.random() * 0.5 - 0.25,
+          opacity: Math.random() * 0.7 + 0.3
+        });
+      }
+    }
+
+    function drawSnow() {
+      ctx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+      for (let flake of flakes) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${flake.opacity})`;
+        ctx.beginPath();
+        ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        flake.y += flake.speed;
+        flake.x += flake.wind;
+
+        if (flake.y > snowCanvas.height) {
+          flake.y = -5;
+          flake.x = Math.random() * snowCanvas.width;
+        }
+        if (flake.x > snowCanvas.width) flake.x = 0;
+        if (flake.x < 0) flake.x = snowCanvas.width;
+      }
+      requestAnimationFrame(drawSnow);
+    }
+
+    /* =====================================================================
+       9. 控制流程
+    ===================================================================== */
+    document.getElementById('btn-start-game').addEventListener('click', () => {
+      initAudio();
+      startModal.classList.add('hidden');
+      initGameData();
+      renderHearts();
+      renderWish();
+      startMemoryCountDown(() => {
+        startTimer();
+      });
     });
 
-    window.onload = () => {
-      resizeSnow();
-      renderSnow();
-      shuffledBoxes = [...PRODUCTS];
-      renderGiftBoxes(false);
-    };
+    document.getElementById('btn-replay').addEventListener('click', () => {
+      finishModal.classList.add('hidden');
+      initGameData();
+      renderHearts();
+      renderWish();
+      startMemoryCountDown(() => {
+        startTimer();
+      });
+    });
+
+    document.getElementById('btn-sound').addEventListener('click', () => {
+      initAudio();
+      soundEnabled = !soundEnabled;
+      document.getElementById('btn-sound').textContent = soundEnabled ? '🔔' : '🔕';
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initSnow();
+      drawSnow();
+    });
   </script>
 </body>
 </html>
