@@ -135,8 +135,8 @@
 
         <!-- 送禮用時 (大綠字) -->
         <div class="bg-black/90 border-2 border-white/20 rounded-2xl px-3 py-1 flex flex-col items-center shadow">
-          <span class="text-[10px] font-black text-slate-300 leading-none">經過時間</span>
-          <span id="timer-text" class="text-sm font-black text-emerald-400 font-fun mt-0.5 tracking-wider">00:00</span>
+          <span class="text-[10px] font-black text-slate-300 leading-none">剩餘時間</span>
+          <span id="timer-text" class="text-sm font-black text-emerald-400 font-fun mt-0.5 tracking-wider">00:15</span>
         </div>
 
         <!-- 鈴鐺按鈕 (大點擊目標) -->
@@ -257,41 +257,41 @@
         </div>
         <div class="text-sm font-bold text-white flex items-center gap-2.5">
           <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-black text-xs flex items-center justify-center flex-shrink-0">2</span>
-          每輪限翻 3 次：看準上方願望，找出正確設備。
+          15 秒極速挑戰：限時 15 秒內，看準願望找出正確設備！
         </div>
         <div class="text-sm font-bold text-white flex items-center gap-2.5">
           <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-black text-xs flex items-center justify-center flex-shrink-0">3</span>
-          滑動上雪橇：按住翻開或未翻開的盒子拖進雪橇！
+          滑動上雪橇：每輪可翻 3 次，看準後按住拖進雪橇！
         </div>
       </div>
 
       <button id="btn-start-game" class="w-full py-4 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white font-black text-base tracking-wide shadow-2xl active:scale-95 transition-transform flex items-center justify-center gap-2 border-2 border-white/40">
-        <span>🚀</span> 開始聖誕送禮挑戰
+        <span>🚀</span> 開始 15 秒聖誕挑戰
       </button>
       <div class="text-xs text-slate-300 font-bold mt-3">支援電腦滑鼠與手機觸控操作</div>
     </div>
 
     <!-- 通關成功結算彈窗 (大字卡片) -->
     <div id="finish-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center hidden">
-      <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-200 flex items-center justify-center text-5xl shadow-[0_0_40px_rgba(251,191,36,0.7)] mb-2 animate-bounce">
+      <div id="finish-icon" class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-200 flex items-center justify-center text-5xl shadow-[0_0_40px_rgba(251,191,36,0.7)] mb-2 animate-bounce">
         🏆
       </div>
-      <h2 class="text-3xl font-black text-white">任務大成功！</h2>
-      <p class="text-sm text-amber-200 font-bold mt-1">所有聖誕願望禮物已全數裝載完畢</p>
+      <h2 id="finish-heading" class="text-3xl font-black text-white">任務大成功！</h2>
+      <p id="finish-subheading" class="text-sm text-amber-200 font-bold mt-1">所有聖誕願望禮物已全數裝載完畢</p>
 
       <!-- 派送員可愛稱號卡片 -->
       <div class="w-full bg-gradient-to-b from-slate-900/95 to-indigo-950/95 border-2 border-amber-400/60 rounded-2xl p-4 my-4 shadow-xl">
         <div class="text-xs font-bold text-amber-300 tracking-wider">獲得特派員榮譽稱號</div>
-        <div id="finish-title" class="text-xl font-black text-white mt-1">超光速極光馴鹿派送員 🦌⚡</div>
+        <div id="finish-title" class="text-xl font-black text-white mt-1">超光速極光馴鹿神手 🦌⚡</div>
         
         <div class="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-white/10">
           <div class="bg-white/10 rounded-xl p-2.5">
-            <div class="text-xs text-slate-300 font-bold">總花費時間</div>
-            <div id="finish-time" class="text-lg font-black text-cyan-300 font-fun">00:35</div>
+            <div class="text-xs text-slate-300 font-bold">挑戰花費時間</div>
+            <div id="finish-time" class="text-lg font-black text-cyan-300 font-fun">00:15</div>
           </div>
           <div class="bg-white/10 rounded-xl p-2.5">
             <div class="text-xs text-slate-300 font-bold">派送成功率</div>
-            <div class="text-lg font-black text-emerald-400 font-fun">100%</div>
+            <div id="finish-rate" class="text-lg font-black text-emerald-400 font-fun">100%</div>
           </div>
         </div>
       </div>
@@ -536,6 +536,7 @@
        3. 遊戲狀態
     ===================================================================== */
     const GAME_BOX_COUNT = 6;
+    const TIME_LIMIT_SECONDS = 15; // 調整為 15 秒限時挑戰
     let activeProducts = [];
     let currentLevel = 0;
     let roundOrder = [];
@@ -543,7 +544,7 @@
     let flipsLeft = 3;
     let isMemoryPhase = false;
     let gameTimer = null;
-    let secondsElapsed = 0;
+    let timeLeft = TIME_LIMIT_SECONDS;
     let isDragging = false;
     let draggedItem = null;
 
@@ -566,8 +567,12 @@
     const countdownNumber = document.getElementById('countdown-number');
     const startModal = document.getElementById('start-modal');
     const finishModal = document.getElementById('finish-modal');
+    const finishHeading = document.getElementById('finish-heading');
+    const finishSubheading = document.getElementById('finish-subheading');
+    const finishIcon = document.getElementById('finish-icon');
     const finishTitle = document.getElementById('finish-title');
     const finishTime = document.getElementById('finish-time');
+    const finishRate = document.getElementById('finish-rate');
     const toastTip = document.getElementById('toast-tip');
 
     function shuffleArray(arr) {
@@ -583,7 +588,7 @@
       activeProducts = shuffleArray(ALL_PRODUCTS).slice(0, GAME_BOX_COUNT);
       roundOrder = shuffleArray([...Array(GAME_BOX_COUNT).keys()]);
       currentLevel = 0;
-      secondsElapsed = 0;
+      timeLeft = TIME_LIMIT_SECONDS;
       updateTimerDisplay();
 
       gridCards = shuffleArray(activeProducts).map((p, idx) => ({
@@ -782,7 +787,7 @@
           } else {
             currentLevel = GAME_BOX_COUNT;
             progressText.textContent = `${currentLevel} / ${GAME_BOX_COUNT}`;
-            finishGame();
+            finishGame(true); // 全部提前送完，完美勝利結算
           }
         }, 600);
       } else {
@@ -833,38 +838,70 @@
     }
 
     /* =====================================================================
-       7. 計時與結算
+       7. 15 秒限時倒數計時與結算
     ===================================================================== */
     function startTimer() {
       clearInterval(gameTimer);
+      updateTimerDisplay();
       gameTimer = setInterval(() => {
-        secondsElapsed++;
+        timeLeft--;
         updateTimerDisplay();
+
+        if (timeLeft <= 5 && timeLeft > 0) {
+          soundTick();
+        }
+
+        if (timeLeft <= 0) {
+          clearInterval(gameTimer);
+          finishGame(false); // 時間歸零強制結算
+        }
       }, 1000);
     }
 
     function updateTimerDisplay() {
-      const m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-      const s = String(secondsElapsed % 60).padStart(2, '0');
+      const m = String(Math.floor(Math.max(0, timeLeft) / 60)).padStart(2, '0');
+      const s = String(Math.max(0, timeLeft) % 60).padStart(2, '0');
       timerText.textContent = `${m}:${s}`;
+
+      if (timeLeft <= 5) {
+        timerText.className = "text-sm font-black text-rose-500 font-fun mt-0.5 tracking-wider animate-pulse";
+      } else {
+        timerText.className = "text-sm font-black text-emerald-400 font-fun mt-0.5 tracking-wider";
+      }
     }
 
-    function getCuteCourierTitle(seconds) {
-      if (seconds <= 30) return '超光速極光馴鹿派送員 🦌⚡';
-      if (seconds <= 50) return '暖心特快車雪橇神手 🛷✨';
-      if (seconds <= 75) return '精準零失誤禮物精靈 🧝🎁';
-      if (seconds <= 105) return '悠閒漫步雪國漫遊者 ⛄❄️';
-      return '佛系觀光聖誕老公公 🎅🎄';
+    function getCuteCourierTitle(ratePercent) {
+      if (ratePercent >= 100) return '超光速極光馴鹿神手 🦌⚡';
+      if (ratePercent >= 80) return '疾速雪橇派送達人 🛷✨';
+      if (ratePercent >= 50) return '穩健巡航禮物精靈 🧝🎁';
+      if (ratePercent > 0) return '雪地慢活馴鹿實習生 ⛄❄️';
+      return '雪堆迷路聖誕小迷糊 🎅📦';
     }
 
-    function finishGame() {
+    function finishGame(isCompletedAll = false) {
       clearInterval(gameTimer);
-      soundVictory();
 
-      const m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-      const s = String(secondsElapsed % 60).padStart(2, '0');
+      const deliveredCount = isCompletedAll ? GAME_BOX_COUNT : currentLevel;
+      const ratePercent = Math.round((deliveredCount / GAME_BOX_COUNT) * 100);
+      const spentSeconds = TIME_LIMIT_SECONDS - Math.max(0, timeLeft);
+      const m = String(Math.floor(spentSeconds / 60)).padStart(2, '0');
+      const s = String(spentSeconds % 60).padStart(2, '0');
+
       finishTime.textContent = `${m}:${s}`;
-      finishTitle.textContent = getCuteCourierTitle(secondsElapsed);
+      finishRate.textContent = `${ratePercent}% (${deliveredCount}/${GAME_BOX_COUNT}件)`;
+      finishTitle.textContent = getCuteCourierTitle(ratePercent);
+
+      if (ratePercent === 100) {
+        soundVictory();
+        finishIcon.textContent = '🏆';
+        finishHeading.textContent = '任務大成功！';
+        finishSubheading.textContent = '太厲害了！在 15 秒內將 6 件禮物全數裝載完畢！';
+      } else {
+        soundWrong();
+        finishIcon.textContent = isCompletedAll ? '🎁' : '⏰';
+        finishHeading.textContent = isCompletedAll ? '派送結算完成' : '15 秒時間到！';
+        finishSubheading.textContent = `成功送出 ${deliveredCount} 件禮物，差一點點就全送達囉！`;
+      }
 
       finishModal.classList.remove('hidden');
     }
