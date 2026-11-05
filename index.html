@@ -250,25 +250,30 @@
       <h1 class="text-2xl font-black text-white tracking-wide">聖誕送禮特派員</h1>
       <p class="text-sm font-bold text-amber-300 mt-1">Zyxel 聖誕禮物裝載大作戰</p>
 
-      <div class="w-full bg-white/10 border-2 border-white/20 rounded-2xl p-4 my-4 text-left space-y-3">
-        <div class="text-sm font-bold text-white flex items-center gap-2.5">
-          <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-black text-xs flex items-center justify-center flex-shrink-0">1</span>
-          開局 5 秒：6 個禮物盒全掀開，考驗瞬間記憶！
+      <!-- 精緻化劇情故事卡片 (取代原本冷硬的 1、2、3 條列) -->
+      <div class="w-full bg-gradient-to-b from-red-950/85 via-amber-950/70 to-slate-900/95 border-2 border-amber-400/80 rounded-3xl p-5 my-4 text-left shadow-2xl relative overflow-hidden">
+        <!-- 背景節慶微裝飾 -->
+        <div class="absolute -right-3 -bottom-3 text-6xl opacity-15 pointer-events-none select-none">🎁</div>
+
+        <div class="flex items-center gap-2 mb-2.5 pb-2 border-b border-amber-400/30">
+          <span class="text-2xl">📜</span>
+          <span class="text-sm sm:text-base font-black text-yellow-300 tracking-wider">北極特派緊急任務</span>
         </div>
-        <div class="text-sm font-bold text-white flex items-center gap-2.5">
-          <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-black text-xs flex items-center justify-center flex-shrink-0">2</span>
-          15 秒極速挑戰：限時 15 秒內，看準願望找出正確設備！
-        </div>
-        <div class="text-sm font-bold text-white flex items-center gap-2.5">
-          <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-black text-xs flex items-center justify-center flex-shrink-0">3</span>
-          滑動上雪橇：每輪可翻 3 次，看準後按住拖進雪橇！
-        </div>
+
+        <p class="text-sm sm:text-base font-bold text-amber-50 leading-relaxed mb-3">
+          平安夜出發前夕，一陣極光暴風雪呼嘯而過，<strong class="text-yellow-300 font-black">聖誕老公公不小心把大家的禮物盒全都搞混了！</strong>
+        </p>
+
+        <p class="text-xs sm:text-sm font-bold text-amber-200/95 leading-relaxed bg-black/40 rounded-2xl p-3 border border-amber-400/30">
+          馴鹿雪橇即將在 <span class="text-yellow-300 font-black underline underline-offset-2">15 秒內</span> 起飛！<br>
+          開局將有 <span class="text-cyan-300 font-black">5 秒時間</span> 掀開盒蓋確認禮物，請憑著瞬間記憶，依照客人的心願把對應設備拖上雪橇，拯救這個聖誕夜吧！
+        </p>
       </div>
 
-      <button id="btn-start-game" class="w-full py-4 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white font-black text-base tracking-wide shadow-2xl active:scale-95 transition-transform flex items-center justify-center gap-2 border-2 border-white/40">
-        <span>🚀</span> 開始 15 秒聖誕挑戰
+      <!-- 與劇情緊密呼應的行動按鈕 -->
+      <button id="btn-start-game" class="w-full py-4 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white font-black text-base tracking-wide shadow-2xl active:scale-95 transition-transform flex items-center justify-center gap-2 border-2 border-white/60">
+        <span>🛷</span> 沒問題，幫聖誕老人裝載雪橇！
       </button>
-      <div class="text-xs text-slate-300 font-bold mt-3">支援電腦滑鼠與手機觸控操作</div>
     </div>
 
     <!-- 通關成功結算彈窗 (大字卡片) -->
