@@ -66,19 +66,69 @@
       visibility: hidden !important;
     }
 
-    /* 脈衝動態光圈 */
-    @keyframes pulse-sleigh {
+    /* 雪橇常態呼吸閃爍光圈 (開局即持續動態閃爍，明確告知玩家這裡就是裝載放置區) */
+    @keyframes pulse-sleigh-idle {
       0%, 100% {
-        box-shadow: 0 0 18px rgba(251, 191, 36, 0.4), inset 0 0 16px rgba(251, 191, 36, 0.25);
-        border-color: rgba(251, 191, 36, 0.85);
+        box-shadow: 0 0 12px rgba(251, 191, 36, 0.4), inset 0 0 14px rgba(251, 191, 36, 0.2);
+        border-color: rgba(251, 191, 36, 0.7);
+        transform: scale(1);
       }
       50% {
-        box-shadow: 0 0 35px rgba(251, 191, 36, 0.95), inset 0 0 28px rgba(251, 191, 36, 0.55);
+        box-shadow: 0 0 28px rgba(251, 191, 36, 0.85), inset 0 0 22px rgba(251, 191, 36, 0.45);
         border-color: rgba(255, 235, 59, 1);
+        transform: scale(1.015);
+      }
+    }
+    .sleigh-idle-blink {
+      animation: pulse-sleigh-idle 1.6s infinite ease-in-out;
+    }
+
+    /* 拖曳時激發更強烈高頻金色閃爍 */
+    @keyframes pulse-sleigh-active {
+      0%, 100% {
+        box-shadow: 0 0 16px rgba(251, 191, 36, 0.6), inset 0 0 18px rgba(251, 191, 36, 0.3);
+        border-color: rgba(251, 191, 36, 0.9);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 38px rgba(255, 235, 59, 1), inset 0 0 30px rgba(255, 235, 59, 0.65);
+        border-color: #ffffff;
+        transform: scale(1.03);
       }
     }
     .sleigh-highlight {
-      animation: pulse-sleigh 1.2s infinite ease-in-out;
+      animation: pulse-sleigh-active 0.6s infinite ease-in-out !important;
+    }
+
+    /* 目標指引標籤常態微幅浮動閃耀 */
+    @keyframes bounce-target-idle {
+      0%, 100% {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(251, 191, 36, 0.35);
+      }
+      50% {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 18px rgba(254, 240, 138, 0.8);
+      }
+    }
+    .target-idle-bounce {
+      animation: bounce-target-idle 1.8s infinite ease-in-out;
+    }
+
+    /* 拖曳時目標標籤彈跳加劇 */
+    @keyframes bounce-target {
+      0%, 100% {
+        transform: translateY(0);
+        background-color: #fbbf24;
+      }
+      50% {
+        transform: translateY(-5px);
+        background-color: #fef08a;
+        box-shadow: 0 0 20px rgba(254, 240, 138, 0.95);
+      }
+    }
+    .target-highlight {
+      animation: bounce-target 0.5s infinite ease-in-out !important;
     }
 
     /* 拖曳中的影子鏡像 */
@@ -176,8 +226,8 @@
 
       <!-- 2. 中間雪橇裝載大區塊 (指示文字明確放大、雪橇大且醒目) -->
       <div class="relative w-full my-1 flex flex-col items-center flex-shrink-0">
-        <!-- 頂部指引標籤 (大字清晰) -->
-        <div class="bg-amber-400 text-slate-950 font-black text-xs py-1 px-4 rounded-full shadow-lg border border-white flex items-center gap-1.5 z-20 -mb-2.5 tracking-wide">
+        <!-- 頂部指引標籤 (開局持續浮動呼吸閃爍) -->
+        <div id="sleigh-guide-tag" class="target-idle-bounce bg-amber-400 text-slate-950 font-black text-xs py-1 px-4 rounded-full shadow-lg border border-white flex items-center gap-1.5 z-20 -mb-2.5 tracking-wide transition-all">
           <span>🛷</span> 👉 把目標禮物拖到雪橇裡裝載！
         </div>
 
@@ -204,8 +254,8 @@
             </span>
           </div>
 
-          <!-- 雪橇大放置盒 -->
-          <div id="sleigh-zone" class="w-full h-[126px] rounded-3xl bg-gradient-to-b from-[#1c0f16]/85 via-[#270e17]/70 to-[#0e0712]/95 border-3 border-dashed border-amber-400/90 p-2 pl-10 flex items-center justify-center shadow-2xl transition-all duration-300">
+          <!-- 雪橇大放置盒 (預設加入 sleigh-idle-blink 開局即持續閃爍動態光暈) -->
+          <div id="sleigh-zone" class="sleigh-idle-blink w-full h-[126px] rounded-3xl bg-gradient-to-b from-[#1c0f16]/85 via-[#270e17]/70 to-[#0e0712]/95 border-3 border-dashed border-amber-400/90 p-2 pl-10 flex items-center justify-center shadow-2xl transition-all duration-300">
             <!-- 經典紅金大雪橇 SVG -->
             <div class="w-full h-full flex items-center justify-center pointer-events-none opacity-95">
               <svg viewBox="0 0 240 130" class="w-full h-full max-h-[110px]" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -556,6 +606,7 @@
     /* DOM 節點 */
     const giftsGrid = document.getElementById('gifts-grid');
     const sleighZone = document.getElementById('sleigh-zone');
+    const sleighGuideTag = document.getElementById('sleigh-guide-tag');
     const dragProxy = document.getElementById('drag-proxy');
     const proxySvgBox = document.getElementById('proxy-svg-box');
     const proxyTitle = document.getElementById('proxy-title');
@@ -717,7 +768,13 @@
             proxyTitle.textContent = `${draggedItem.gridIndex + 1} 號禮盒`;
             dragProxy.className = "w-28 h-28 rounded-2xl flex flex-col items-center justify-center p-2.5 border-3 border-amber-400 bg-red-950/95 backdrop-blur-md shadow-2xl";
           }
+          // 抓取拖曳時，由常態閃爍升級為高頻強烈金色閃爍
+          sleighZone.classList.remove('sleigh-idle-blink');
           sleighZone.classList.add('sleigh-highlight');
+          if (sleighGuideTag) {
+            sleighGuideTag.classList.remove('target-idle-bounce');
+            sleighGuideTag.classList.add('target-highlight');
+          }
         }
 
         if (isDragging) {
@@ -733,7 +790,13 @@
         if (isDragging) {
           isDragging = false;
           dragProxy.style.display = 'none';
+          // 拖曳結束：恢復常態金光呼吸閃爍
           sleighZone.classList.remove('sleigh-highlight');
+          sleighZone.classList.add('sleigh-idle-blink');
+          if (sleighGuideTag) {
+            sleighGuideTag.classList.remove('target-highlight');
+            sleighGuideTag.classList.add('target-idle-bounce');
+          }
 
           const sleighRect = sleighZone.getBoundingClientRect();
           const inSleigh = (
